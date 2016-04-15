@@ -7,15 +7,20 @@ use SeaBattle\Field\Field;
 
 class Game
 {
+    const NO_WINNER = 0;
+    const I_AM_WINNER = 1;
+    const ENEMY_IS_WINNER = 2;
+
     private $myField;
     private $enemyField;
-    private $_isGameRunning = false;
-    private $_isMyTurn = true;
+    private $gameover = false;
+    private $winner = self::NO_WINNER;
 
-    public function __construct(Field $myField, Field $enemyField)
+
+    public function __construct()
     {
-        $this->myField = $myField;
-        $this->enemyField = $enemyField;
+        $this->myField = new Field();
+        $this->enemyField = new Field();
     }
 
     public function getMyField()
@@ -28,53 +33,48 @@ class Game
         return $this->enemyField;
     }
 
-    public function isMyTurn()
+
+    public function isGameover()
     {
-        return $this->_isMyTurn;
+        return $this->gameover;
     }
 
-    public function isRunning()
+    public function setGameover($gameover)
     {
-        return $this->_isGameRunning;
-    }
-
-    public function setRunning($isRunning)
-    {
-        $this->_isGameRunning = $isRunning;
+        $this->gameover = $gameover;
     }
 
 
-    public function passTurnToNextPlayer()
+    public function getWinner()
     {
-        $this->_isMyTurn = !$this->isMyTurn();
+        return $this->winner;
+    }
+
+    public function setWinner($winner)
+    {
+        $this->winner = $winner;
     }
 
 
-    public function clearFields()
+    public function startNewGame()
     {
-        $this->myField->clear();
-        $this->enemyField->clear();
+        $this->myField = new Field();
+        $this->myField->createShips();
+        $this->myField->placeShipsRandomly();
+
+        $this->enemyField = new Field();
+        $this->enemyField->createShips();
+        $this->enemyField->placeShipsRandomly();
     }
 
 
-    public function startGame()
+    public function shootingTo(Field $attackedField, $x, $y)
     {
-        if (!$this->myField->isReady()) {
-            throw new \Exception('My Field is not ready!');
+        $result = $attackedField->handleShot($x, $y);
+
+        if ($result['isGameover'] === true) {
+            $this->setGameover(true);
+            $this->setWinner($result['winner']);
         }
-
-        $this->enemyField->locateShips();
-
-        if (!$this->enemyField->isReady()) {
-            throw new \Exception('Enemy Field is not ready!');
-        }
     }
-
-
-    public function shootingTo(Field $fieldUnderFire, $x, $y)
-    {
-        $fieldUnderFire->handleShot($x, $y);
-    }
-
-
 }

@@ -13,12 +13,17 @@ class Field
 
     private $slots;
     private $ships;
-    private $_isReady;
+    private $aliveShips = 0;
+    private $shipsToBeCreated = [
+        ['size' => 1, 'amount' => 4],
+        ['size' => 2, 'amount' => 3],
+        ['size' => 3, 'amount' => 2],
+        ['size' => 4, 'amount' => 1],
+    ];
+
 
     public function __construct()
     {
-        $this->_isReady = false;
-
         for ($i = 0; $i < self::WIDTH; $i++) {
             for ($j = 0; $j < self::HEIGT; $j++) {
                 $this->slots[$i][$j] = new Slot();
@@ -26,15 +31,19 @@ class Field
         }
     }
 
-    public function isReady()
+    public function createShips()
     {
-        return $this->_isReady;
+        foreach ($this->shipsToBeCreated as $shipsInfo) {
+            for ($i=0; $i<$shipsInfo['amount']; $i++) {
+                $this->ships[] = new Ship($shipsInfo['size']);
+                $this->aliveShips++;
+            }
+        }
     }
 
-    public function locateShips()
-    {
-        $this->createShips();
 
+    public function placeShipsRandomly()
+    {
         foreach($this->ships as $ship) {
 
             do {
@@ -48,35 +57,30 @@ class Field
         }
     }
 
-    public function createShips()
-    {
-        $this->ships[] = new Ship(1);
-        $this->ships[] = new Ship(1);
-        $this->ships[] = new Ship(1);
-        $this->ships[] = new Ship(1);
-
-        $this->ships[] = new Ship(2);
-        $this->ships[] = new Ship(2);
-        $this->ships[] = new Ship(2);
-
-        $this->ships[] = new Ship(3);
-        $this->ships[] = new Ship(3);
-
-        $this->ships[] = new Ship(4);
-    }
-
 
     public function draw()
     {
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < self::WIDTH; $i++) {
             echo '<tr>';
 
-            for ($j = 0; $j < 10; $j++) {
+            for ($j = 0; $j < self::HEIGT; $j++) {
                 echo '<td';
 
                 switch($this->slots[$i][$j]->getState()) {
+                    case Slot::SLOT_IS_UNCOVERED:
+                        echo ' class="uncovered"';
+                        break;
+                    case Slot::SLOT_IS_EMPTY:
+                        echo ' class="empty"';
+                        break;
+                    case Slot::PLAYER_MISSED:
+                        echo ' class="missed"';
+                        break;
                     case Slot::THERE_IS_A_SHIP:
-                        echo ' class="placedShip"';
+                        echo ' class="ship"';
+                        break;
+                    case Slot::SHIP_WAS_HIT:
+                        echo ' class="hit';
                         break;
                 }
 
@@ -87,8 +91,16 @@ class Field
         }
     }
 
+
     public function getSlot($x, $y)
     {
         return $this->slots[$x][$y];
     }
+
+
+    public function handleShot($x, $y)
+    {
+
+    }
+
 }
