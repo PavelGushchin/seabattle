@@ -5,6 +5,9 @@ namespace SeaBattle\Ship;
 
 class Ship
 {
+    const HORIZONTAL = 0;
+    const VERTICAL = 1;
+
     private $id;
     private $isDead;
     private $size;
@@ -12,6 +15,12 @@ class Ship
     private $parts;
     private $direction;
     private $valid = false;
+    private $startX;
+    private $startY;
+    private $endX;
+    private $endY;
+
+
 
     /**
      * @return boolean
@@ -45,8 +54,9 @@ class Ship
         $this->direction = $direction;
     }
 
-    public function __construct($size)
+    public function __construct($id, $size)
     {
+        $this->id = $id;
         $this->size = $size;
     }
 
@@ -60,8 +70,72 @@ class Ship
         $this->parts[] = $x . '-' . $y;
     }
 
-    public function generateAndCheck($direction, $x, $y)
+    public function getId()
     {
-
+        return $this->id;
     }
+
+
+
+
+    public function getStartX()
+    {
+        return $this->startX;
+    }
+
+
+    public function setStartX($startX)
+    {
+        $this->startX = $startX;
+    }
+
+
+    public function getStartY()
+    {
+        return $this->startY;
+    }
+
+
+    public function setStartY($startY)
+    {
+        $this->startY = $startY;
+    }
+
+
+    public function getEndX()
+    {
+        return $this->endX;
+    }
+
+
+    public function setEndX($endX)
+    {
+        $this->endX = $endX;
+    }
+
+
+    public function getEndY()
+    {
+        return $this->endY;
+    }
+
+
+    public function setEndY($endY)
+    {
+        $this->endY = $endY;
+    }
+
+
+
+    public function getSize()
+    {
+        return $this->size;
+    }
+
+
+    public function setSize($size)
+    {
+        $this->size = $size;
+    }
+
 }

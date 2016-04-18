@@ -11,8 +11,8 @@ class Field
     const WIDTH = 10;
     const HEIGT = 10;
 
-    private $slots;
-    private $ships;
+    private $slots = [];
+    private $ships = [];
     private $aliveShips = 0;
     private $shipsToBeCreated = [
         ['size' => 1, 'amount' => 4],
@@ -35,7 +35,8 @@ class Field
     {
         foreach ($this->shipsToBeCreated as $shipsInfo) {
             for ($i=0; $i<$shipsInfo['amount']; $i++) {
-                $this->ships[] = new Ship($shipsInfo['size']);
+                $shipId = $this->aliveShips;
+                $this->ships[] = new Ship($shipId, $shipsInfo['size']);
                 $this->aliveShips++;
             }
         }
@@ -45,20 +46,97 @@ class Field
     public function placeShipsRandomly()
     {
         foreach($this->ships as $ship) {
-
             do {
-                $direction = mt_rand(0, 1);
+                $ship->setDirection( mt_rand(Ship::HORIZONTAL, Ship::VERTICAL) );
 
-                $firstSlotX = mt_rand(0, 9);
-                $firstSlotY = mt_rand(0, 9);
+                $ship->setStartX( mt_rand(0, self::WIDTH - 1) );
 
-                $isValid = $ship->generateAndCheck($direction, $firstSlotX, $firstSlotY);
-            } while (!$isValid);
+                $ship->setStartY( mt_rand(0, self::HEIGT - 1) );
+
+                $isShipLocatedCorrectly = $this->ifSizeOfShipIsNotVeryLong($ship)
+                    && $this->ifSpaceAroundShipIsEmpty($ship);
+            } while (!$isShipLocatedCorrectly);
+
+            $this->placeShipOnMap($ship);
         }
     }
 
 
-    public function draw()
+    private function ifSizeOfShipIsNotVeryLong($ship)
+    {
+        $endX = $ship->getStartX();
+        $endY = $ship->getStartY();
+
+        switch ($ship->getDirection()) {
+            case Ship::HORIZONTAL:
+                $endX = $endX + $ship->getSize() - 1;
+                break;
+            case Ship::VERTICAL:
+                $endY = $endY + $ship->getSize() - 1;
+                break;
+        }
+
+        if ($endX >= self::WIDTH || $endY >= self::HEIGT) {
+            return false;
+        }
+
+        $ship->setEndX($endX);
+        $ship->setEndY($endY);
+
+        return true;
+    }
+
+
+    private function ifSpaceAroundShipIsEmpty($ship)
+    {
+        $checkedAreaStartX = $ship->getStartX() - 1;
+        $checkedAreaStartY = $ship->getStartY() - 1;
+
+        if ($checkedAreaStartX < 0) {
+            $checkedAreaStartX = 0;
+        }
+
+        if ($checkedAreaStartY < 0) {
+            $checkedAreaStartY = 0;
+        }
+
+
+        $checkedAreaEndX = $ship->getEndX() + 1;
+        $checkedAreaEndY = $ship->getEndY() + 1;
+
+        if ($checkedAreaEndX >= self::WIDTH) {
+            $checkedAreaEndX = self::WIDTH - 1;
+        }
+
+        if ($checkedAreaEndY >= self::HEIGT) {
+            $checkedAreaEndY = self::HEIGT - 1;
+        }
+
+
+        for ($i = $checkedAreaStartX; $i <= $checkedAreaEndX; $i++) {
+            for ($j = $checkedAreaStartY; $j <= $checkedAreaEndY; $j++) {
+                if ($this->slots[$i][$j]->getState() === Slot::THERE_IS_A_SHIP) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+
+    private function placeShipOnMap($ship)
+    {
+        for ($i = $ship->getStartX(); $i <= $ship->getEndX(); $i++) {
+            for ($j = $ship->getStartY(); $j <= $ship->getEndY(); $j++) {
+                $this->slots[$i][$j]->setState(Slot::THERE_IS_A_SHIP);
+                $this->slots[$i][$j]->setShipId($ship->getId());
+            }
+        }
+    }
+
+
+    public function draw($isEnemy = false)
     {
         for ($i = 0; $i < self::WIDTH; $i++) {
             echo '<tr>';
@@ -77,14 +155,16 @@ class Field
                         echo ' class="missed"';
                         break;
                     case Slot::THERE_IS_A_SHIP:
-                        echo ' class="ship"';
+                        echo $isEnemy === false
+                            ? ' class="ship"'
+                            : ' class="uncovered"';
                         break;
                     case Slot::SHIP_WAS_HIT:
                         echo ' class="hit';
                         break;
                 }
 
-                echo '></td>';
+                echo ' data-x=' . $i . ' data-y=' . $j . '></td>';
             }
 
             echo '</tr>';
@@ -100,7 +180,17 @@ class Field
 
     public function handleShot($x, $y)
     {
+        $slot = $this->getSlot($x, $y);
 
+        switch ($slot->getState()) {
+            case Slot::SLOT_IS_UNCOVERED:
+                $slot->setState(Slot::PLAYER_MISSED);
+                break;
+            case Slot::THERE_IS_A_SHIP:
+                $slot->setState(Slot::SHIP_WAS_HIT);
+
+                break;
+        }
     }
 
 }

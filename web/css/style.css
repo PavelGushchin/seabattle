@@ -60,6 +60,12 @@ ul li:hover {
     background-color: darkorange;
 }
 
-.placedShip {
+.missed {
+    background-color: gray;
+}
+.ship {
     background-color: green;
+}
+.hit {
+    background-color: red;
 }

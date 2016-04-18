@@ -3,6 +3,7 @@
 require "../vendor/autoload.php";
 
 use SeaBattle\Game\Game;
+use SeaBattle\Field\Field;
 
 
 error_reporting(E_ALL);
@@ -23,7 +24,7 @@ $myField = $game->getMyField();
 $enemyField = $game->getEnemyField();
 
 
-if (isset($_POST['startNewGame'])) {
+if (isset($_GET['startNewGame'])) {
     $_SESSION = [];
 
     $game = new Game();
@@ -39,7 +40,9 @@ if (isset($_GET['x']) && isset($_GET['y'])) {
     }
 
     if (!$game->isGameover()) {
-        $game->shootingTo($myField, null, null);
+        $x = mt_rand(0, Field::WIDTH - 1);
+        $y = mt_rand(0, Field::HEIGT - 1);
+        $game->shootingTo($myField, $x, $y);
     }
 }
 
@@ -90,12 +93,12 @@ $_SESSION['game'] = serialize($game);
             <h2>Enemy's ships</h2>
 
             <table id="enemyField">
-                <?php $enemyField->draw(); ?>
+                <?php $enemyField->draw(true); ?>
             </table>
         </div>
 
 
-        <form id="startGameForm" method="post" action="">
+        <form id="startGameForm" method="get" action="">
             <input type="hidden" name="startNewGame" value="true">
             <button id="startGame">New Game</button>
         </form>
