@@ -14,11 +14,13 @@ class Field
     private $slots = [];
     private $ships = [];
     private $aliveShips = 0;
+//    private $totalAmountOfShips = 0;
+//    private $deadShips = 0;
     private $shipsToBeCreated = [
-        ['size' => 1, 'amount' => 4],
-        ['size' => 2, 'amount' => 3],
-        ['size' => 3, 'amount' => 2],
         ['size' => 4, 'amount' => 1],
+        ['size' => 3, 'amount' => 2],
+        ['size' => 2, 'amount' => 3],
+        ['size' => 1, 'amount' => 4],
     ];
 
 
@@ -142,25 +144,25 @@ class Field
             echo '<tr>';
 
             for ($j = 0; $j < self::HEIGT; $j++) {
-                echo '<td';
+                echo '<td ';
 
                 switch($this->slots[$i][$j]->getState()) {
                     case Slot::SLOT_IS_UNCOVERED:
-                        echo ' class="uncovered"';
+                        echo 'class="uncovered"';
                         break;
                     case Slot::SLOT_IS_EMPTY:
-                        echo ' class="empty"';
+                        echo 'class="empty"';
                         break;
                     case Slot::PLAYER_MISSED:
-                        echo ' class="missed"';
+                        echo 'class="missed"';
                         break;
                     case Slot::THERE_IS_A_SHIP:
                         echo $isEnemy === false
-                            ? ' class="ship"'
-                            : ' class="uncovered"';
+                            ? 'class="ship"'
+                            : 'class="uncovered"';
                         break;
                     case Slot::SHIP_WAS_HIT:
-                        echo ' class="hit';
+                        echo 'class="hit"';
                         break;
                 }
 
@@ -180,6 +182,11 @@ class Field
 
     public function handleShot($x, $y)
     {
+        if ($x < 0 || $x >= self::WIDTH ||
+            $y < 0 || $y >= self::HEIGT) {
+            return;
+        }
+
         $slot = $this->getSlot($x, $y);
 
         switch ($slot->getState()) {
@@ -188,6 +195,14 @@ class Field
                 break;
             case Slot::THERE_IS_A_SHIP:
                 $slot->setState(Slot::SHIP_WAS_HIT);
+                /*$shipId = $slot->getShipId();
+                $isDead = $this->ships[$shipId]->wasHit();
+
+                if ($isDead) {
+
+                } else {
+                    $slot->setState(Slot::SHIP_WAS_HIT);
+                }*/
 
                 break;
         }

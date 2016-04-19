@@ -20,10 +20,6 @@ if (isset($_SESSION['game'])) {
 }
 
 
-$myField = $game->getMyField();
-$enemyField = $game->getEnemyField();
-
-
 if (isset($_GET['startNewGame'])) {
     $_SESSION = [];
 
@@ -31,6 +27,9 @@ if (isset($_GET['startNewGame'])) {
     $game->startNewGame();
 }
 
+
+$myField = $game->getMyField();
+$enemyField = $game->getEnemyField();
 
 if (isset($_GET['x']) && isset($_GET['y'])) {
     if (!$game->isGameover()) {

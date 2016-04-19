@@ -12,7 +12,7 @@ class Slot
     const SHIP_WAS_HIT = 4;
 
     private $state = self::SLOT_IS_UNCOVERED;
-    private $shipId = 0;
+    private $shipId = null;
 
     public function setShipId($shipId)
     {
