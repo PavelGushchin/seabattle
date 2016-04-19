@@ -23,6 +23,35 @@ class Game
         $this->enemyField = new Field();
     }
 
+
+    public function startNewGame()
+    {
+        $this->myField = new Field();
+        $this->myField->createShips();
+        $this->myField->placeShipsRandomly();
+
+        $this->enemyField = new Field();
+        $this->enemyField->createShips();
+        $this->enemyField->placeShipsRandomly();
+    }
+
+
+    public function shootingTo(Field $attackedField, $x, $y, $isEnemy = false)
+    {
+        $attackedField->handleShot($x, $y);
+
+        if ($attackedField->allShipsAreDead()) {
+            $this->setGameover(true);
+
+            if ($isEnemy === false) {
+                $this->setWinner(Game::I_AM_WINNER);
+            } else {
+                $this->setWinner(Game::ENEMY_IS_WINNER);
+            }
+        }
+    }
+
+
     public function getMyField()
     {
         return $this->myField;
@@ -53,28 +82,5 @@ class Game
     public function setWinner($winner)
     {
         $this->winner = $winner;
-    }
-
-
-    public function startNewGame()
-    {
-        $this->myField = new Field();
-        $this->myField->createShips();
-        $this->myField->placeShipsRandomly();
-
-        $this->enemyField = new Field();
-        $this->enemyField->createShips();
-        $this->enemyField->placeShipsRandomly();
-    }
-
-
-    public function shootingTo(Field $attackedField, $x, $y)
-    {
-        $result = $attackedField->handleShot($x, $y);
-
-        if ($result['isGameover'] === true) {
-            $this->setGameover(true);
-            $this->setWinner($result['winner']);
-        }
     }
 }

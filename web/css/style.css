@@ -1,7 +1,6 @@
 #container {
     width: 800px;
     margin: 0 auto;
-    /*background-color: aquamarine;*/
     text-align: center;
 }
 
@@ -23,7 +22,6 @@ th, td {
 #myFieldContainer, #enemyFieldContainer {
     display: inline-block;
     margin: 0 15px;
-    /*width: 240px;*/
 }
 
 #myShips, #myShips h3 {
@@ -33,19 +31,6 @@ th, td {
 #myShips {
     width: 150px;
     margin-left: 50px;
-    /*display: inline-block;*/
-}
-
-ul {
-    list-style-type: none;
-    /*margin: 10px;*/
-    padding-left: 10px;
-    /*display: inline-block;*/
-}
-
-ul li:hover {
-    opacity: 0.5;
-    cursor: pointer;
 }
 
 #startGame {
@@ -56,10 +41,6 @@ ul li:hover {
     margin: 20px 0;
 }
 
-.phantomShip {
-    background-color: darkorange;
-}
-
 .missed {
     background-color: gray;
 }
@@ -67,5 +48,14 @@ ul li:hover {
     background-color: green;
 }
 .hit {
+    background-color: darkorange;
+}
+.dead {
     background-color: red;
+}
+#victory {
+    color: green;
+}
+#defeat {
+    color: red;
 }

@@ -2,7 +2,6 @@
 
 namespace SeaBattle\Field;
 
-use SeaBattle\Field\Slot;
 use SeaBattle\Ship\Ship;
 
 
@@ -13,9 +12,8 @@ class Field
 
     private $slots = [];
     private $ships = [];
-    private $aliveShips = 0;
-//    private $totalAmountOfShips = 0;
-//    private $deadShips = 0;
+    private $totalAmountOfShips = 0;
+    private $deadShips = 0;
     private $shipsToBeCreated = [
         ['size' => 4, 'amount' => 1],
         ['size' => 3, 'amount' => 2],
@@ -33,13 +31,14 @@ class Field
         }
     }
 
+
     public function createShips()
     {
         foreach ($this->shipsToBeCreated as $shipsInfo) {
             for ($i=0; $i<$shipsInfo['amount']; $i++) {
-                $shipId = $this->aliveShips;
-                $this->ships[] = new Ship($shipId, $shipsInfo['size']);
-                $this->aliveShips++;
+                $shipId = $this->totalAmountOfShips;
+                $this->ships[$shipId] = new Ship($shipId, $shipsInfo['size']);
+                $this->totalAmountOfShips++;
             }
         }
     }
@@ -55,8 +54,8 @@ class Field
 
                 $ship->setStartY( mt_rand(0, self::HEIGT - 1) );
 
-                $isShipLocatedCorrectly = $this->ifSizeOfShipIsNotVeryLong($ship)
-                    && $this->ifSpaceAroundShipIsEmpty($ship);
+                $isShipLocatedCorrectly = $this->isSizeOfShipIsNotVeryLong($ship)
+                    && $this->isSpaceAroundShipIsEmpty($ship);
             } while (!$isShipLocatedCorrectly);
 
             $this->placeShipOnMap($ship);
@@ -64,7 +63,7 @@ class Field
     }
 
 
-    private function ifSizeOfShipIsNotVeryLong($ship)
+    private function isSizeOfShipIsNotVeryLong($ship)
     {
         $endX = $ship->getStartX();
         $endY = $ship->getStartY();
@@ -89,7 +88,7 @@ class Field
     }
 
 
-    private function ifSpaceAroundShipIsEmpty($ship)
+    private function isSpaceAroundShipIsEmpty($ship)
     {
         $checkedAreaStartX = $ship->getStartX() - 1;
         $checkedAreaStartY = $ship->getStartY() - 1;
@@ -114,7 +113,6 @@ class Field
             $checkedAreaEndY = self::HEIGT - 1;
         }
 
-
         for ($i = $checkedAreaStartX; $i <= $checkedAreaEndX; $i++) {
             for ($j = $checkedAreaStartY; $j <= $checkedAreaEndY; $j++) {
                 if ($this->slots[$i][$j]->getState() === Slot::THERE_IS_A_SHIP) {
@@ -134,6 +132,42 @@ class Field
                 $this->slots[$i][$j]->setState(Slot::THERE_IS_A_SHIP);
                 $this->slots[$i][$j]->setShipId($ship->getId());
             }
+        }
+    }
+
+
+    public function handleShot($x, $y)
+    {
+        if ($x < 0 || $x >= self::WIDTH ||
+            $y < 0 || $y >= self::HEIGT) {
+            return;
+        }
+
+        $slot = $this->getSlot($x, $y);
+
+        switch ($slot->getState()) {
+            case Slot::SLOT_IS_UNCOVERED:
+                $slot->setState(Slot::PLAYER_MISSED);
+                break;
+            case Slot::THERE_IS_A_SHIP:
+                $shipId = $slot->getShipId();
+                $ship = $this->ships[$shipId];
+
+                $isShipDead = $ship->addHitAndCheckForDeath();
+
+                if ($isShipDead) {
+                    $this->deadShips++;
+
+                    for ($i = $ship->getStartX(); $i <= $ship->getEndX(); $i++) {
+                        for ($j = $ship->getStartY(); $j <= $ship->getEndY(); $j++) {
+                            $this->getSlot($i,$j)->setState(Slot::SHIP_IS_DEAD);
+                        }
+                    }
+                } else {
+                    $slot->setState(Slot::SHIP_WAS_HIT);
+                }
+
+                break;
         }
     }
 
@@ -164,6 +198,9 @@ class Field
                     case Slot::SHIP_WAS_HIT:
                         echo 'class="hit"';
                         break;
+                    case Slot::SHIP_IS_DEAD:
+                        echo 'class="dead"';
+                        break;
                 }
 
                 echo ' data-x=' . $i . ' data-y=' . $j . '></td>';
@@ -174,38 +211,17 @@ class Field
     }
 
 
+    public function allShipsAreDead()
+    {
+        return ($this->totalAmountOfShips === $this->deadShips)
+            ? true
+            : false
+            ;
+    }
+
+
     public function getSlot($x, $y)
     {
         return $this->slots[$x][$y];
     }
-
-
-    public function handleShot($x, $y)
-    {
-        if ($x < 0 || $x >= self::WIDTH ||
-            $y < 0 || $y >= self::HEIGT) {
-            return;
-        }
-
-        $slot = $this->getSlot($x, $y);
-
-        switch ($slot->getState()) {
-            case Slot::SLOT_IS_UNCOVERED:
-                $slot->setState(Slot::PLAYER_MISSED);
-                break;
-            case Slot::THERE_IS_A_SHIP:
-                $slot->setState(Slot::SHIP_WAS_HIT);
-                /*$shipId = $slot->getShipId();
-                $isDead = $this->ships[$shipId]->wasHit();
-
-                if ($isDead) {
-
-                } else {
-                    $slot->setState(Slot::SHIP_WAS_HIT);
-                }*/
-
-                break;
-        }
-    }
-
 }

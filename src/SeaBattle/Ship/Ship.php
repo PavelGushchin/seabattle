@@ -11,48 +11,13 @@ class Ship
     private $id;
     private $isDead;
     private $size;
-    private $hits;
-    private $parts;
+    private $hits = 0;
     private $direction;
-    private $valid = false;
     private $startX;
     private $startY;
     private $endX;
     private $endY;
 
-
-
-    /**
-     * @return boolean
-     */
-    public function isValid()
-    {
-        return $this->valid;
-    }
-
-    /**
-     * @param boolean $valid
-     */
-    public function setValid($valid)
-    {
-        $this->valid = $valid;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDirection()
-    {
-        return $this->direction;
-    }
-
-    /**
-     * @param mixed $direction
-     */
-    public function setDirection($direction)
-    {
-        $this->direction = $direction;
-    }
 
     public function __construct($id, $size)
     {
@@ -60,22 +25,36 @@ class Ship
         $this->size = $size;
     }
 
-    public function clearParts()
+
+    public function addHitAndCheckForDeath()
     {
-        $this->parts = [];
+        $this->hits++;
+
+        if ($this->size === $this->hits) {
+            $this->isDead = true;
+            return true;
+        }
+
+        return false;
     }
 
-    public function addPart($x, $y)
+
+    public function getDirection()
     {
-        $this->parts[] = $x . '-' . $y;
+        return $this->direction;
     }
+
+
+    public function setDirection($direction)
+    {
+        $this->direction = $direction;
+    }
+
 
     public function getId()
     {
         return $this->id;
     }
-
-
 
 
     public function getStartX()
@@ -137,5 +116,10 @@ class Ship
     {
         $this->size = $size;
     }
+
+
+
+
+
 
 }

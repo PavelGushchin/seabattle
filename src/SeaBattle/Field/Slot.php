@@ -10,18 +10,15 @@ class Slot
     const PLAYER_MISSED = 2;
     const THERE_IS_A_SHIP = 3;
     const SHIP_WAS_HIT = 4;
+    const SHIP_IS_DEAD = 5;
 
     private $state = self::SLOT_IS_UNCOVERED;
     private $shipId = null;
 
-    public function setShipId($shipId)
-    {
-        $this->shipId = $shipId;
-    }
 
-    public function getShipId()
+    public function getState()
     {
-        return $this->shipId;
+        return $this->state;
     }
 
     public function setState($state)
@@ -29,8 +26,14 @@ class Slot
         $this->state = $state;
     }
 
-    public function getState()
+
+    public function getShipId()
     {
-        return $this->state;
+        return $this->shipId;
+    }
+
+    public function setShipId($shipId)
+    {
+        $this->shipId = $shipId;
     }
 }

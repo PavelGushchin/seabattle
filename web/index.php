@@ -41,7 +41,7 @@ if (isset($_GET['x']) && isset($_GET['y'])) {
     if (!$game->isGameover()) {
         $x = mt_rand(0, Field::WIDTH - 1);
         $y = mt_rand(0, Field::HEIGT - 1);
-        $game->shootingTo($myField, $x, $y);
+        $game->shootingTo($myField, $x, $y, true);
     }
 }
 
@@ -64,19 +64,6 @@ $_SESSION['game'] = serialize($game);
     <div id="container">
         <h1>Sea Battle</h1>
 
-        <?php
-            if ($game->isGameover()) {
-                switch($game->getWinner()) {
-                    case Game::I_AM_WINNER:
-                        echo '<h2 class="victory">You are a winner!</h2>';
-                        break;
-                    case Game::ENEMY_IS_WINNER:
-                        echo '<h2 class="defeat">Enemy is a winner!</h2>';
-                        break;
-                }
-            }
-        ?>
-
         <div id="myFieldContainer">
 
             <h2>My ships</h2>
@@ -95,6 +82,20 @@ $_SESSION['game'] = serialize($game);
                 <?php $enemyField->draw(true); ?>
             </table>
         </div>
+
+
+        <?php
+        if ($game->isGameover()) {
+            switch($game->getWinner()) {
+                case Game::I_AM_WINNER:
+                    echo '<h1 id="victory">You are the winner!</h1>';
+                    break;
+                case Game::ENEMY_IS_WINNER:
+                    echo '<h1 id="defeat">Enemy is the winner!</h1>';
+                    break;
+            }
+        }
+        ?>
 
 
         <form id="startGameForm" method="get" action="">
