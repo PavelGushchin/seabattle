@@ -3,6 +3,8 @@
 namespace SeaBattle\Game;
 
 use SeaBattle\Field\Field;
+use SeaBattle\AI\SmartShootingAI;
+use SeaBattle\AI\RandomShootingAI;
 
 
 class Game
@@ -20,7 +22,7 @@ class Game
     public function __construct()
     {
         $this->myField = new Field();
-        $this->enemyField = new Field();
+        $this->enemyField = new Field(new RandomShootingAI());
     }
 
 
@@ -30,7 +32,7 @@ class Game
         $this->myField->createShips();
         $this->myField->placeShipsRandomly();
 
-        $this->enemyField = new Field();
+        $this->enemyField = new Field(new RandomShootingAI());
         $this->enemyField->createShips();
         $this->enemyField->placeShipsRandomly();
     }

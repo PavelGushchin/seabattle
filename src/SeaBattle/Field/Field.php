@@ -3,6 +3,7 @@
 namespace SeaBattle\Field;
 
 use SeaBattle\Ship\Ship;
+use SeaBattle\AI\IShootingAI;
 
 
 class Field
@@ -23,7 +24,7 @@ class Field
     ];
 
 
-    public function __construct($shootingAI = null)
+    public function __construct(IShootingAI $shootingAI = null)
     {
         $this->shootingAI = $shootingAI;
 
@@ -226,5 +227,17 @@ class Field
     public function getSlot($x, $y)
     {
         return $this->slots[$x][$y];
+    }
+
+
+    public function getSlots()
+    {
+        return $this->slots;
+    }
+
+
+    public function getShootingAI()
+    {
+        return $this->shootingAI;
     }
 }

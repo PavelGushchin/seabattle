@@ -2,12 +2,16 @@
 
 namespace SeaBattle\AI;
 
-use SeaBattle\Field\Field;
+use SeaBattle\Field\Slot;
 
-class SmartShooting implements IShootingAI
+class SmartShootingAI implements IShootingAI
 {
-    public function calculateCoordsForShooting(Field $attackedField)
+    private $partsOfdamagedShip = [];
+    private $smellBlood = false;
+    private $variantsForNextShot = [];
+
+    public function calculateCoordsForShooting($slots)
     {
-        // TODO: Implement calculateCoordsForShooting() method.
+
     }
 }
