@@ -12,6 +12,7 @@ class Field
 
     private $slots = [];
     private $ships = [];
+    private $shootingAI;
     private $totalAmountOfShips = 0;
     private $deadShips = 0;
     private $shipsToBeCreated = [
@@ -22,8 +23,10 @@ class Field
     ];
 
 
-    public function __construct()
+    public function __construct($shootingAI = null)
     {
+        $this->shootingAI = $shootingAI;
+
         for ($i = 0; $i < self::WIDTH; $i++) {
             for ($j = 0; $j < self::HEIGT; $j++) {
                 $this->slots[$i][$j] = new Slot();
@@ -216,7 +219,7 @@ class Field
         return ($this->totalAmountOfShips === $this->deadShips)
             ? true
             : false
-            ;
+        ;
     }
 
 
