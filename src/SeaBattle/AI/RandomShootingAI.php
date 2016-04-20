@@ -7,7 +7,7 @@ use SeaBattle\Field\Field;
 
 class RandomShootingAI implements IShootingAI
 {
-    public function calculateCoordsForShooting($slots)
+    public function calculateCoordsForShooting($slots, $ships = null)
     {
         do {
             $x = mt_rand(0, Field::WIDTH - 1);

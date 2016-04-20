@@ -118,8 +118,9 @@ class Ship
     }
 
 
-
-
-
+    public function getHits()
+    {
+        return $this->hits;
+    }
 
 }

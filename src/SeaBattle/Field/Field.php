@@ -235,6 +235,11 @@ class Field
         return $this->slots;
     }
 
+    public function getShips()
+    {
+        return $this->ships;
+    }
+
 
     public function getShootingAI()
     {

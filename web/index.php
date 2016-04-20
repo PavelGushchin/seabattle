@@ -40,10 +40,12 @@ if (isset($_GET['x']) && isset($_GET['y'])) {
 
     if (!$game->isGameover()) {
         $shootingAI = $enemyField->getShootingAI();
-        $coords = $shootingAI->calculateCoordsForShooting($myField->getSlots());
 
-        /*$x = mt_rand(0, Field::WIDTH - 1);
-        $y = mt_rand(0, Field::HEIGT - 1);*/
+        $coords = $shootingAI->calculateCoordsForShooting(
+            $myField->getSlots(),
+            $myField->getShips()
+        );
+
         $game->shootingTo($myField, $coords['x'], $coords['y'], true);
     }
 }

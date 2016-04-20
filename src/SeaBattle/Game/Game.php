@@ -22,7 +22,7 @@ class Game
     public function __construct()
     {
         $this->myField = new Field();
-        $this->enemyField = new Field(new RandomShootingAI());
+        $this->enemyField = new Field(new SmartShootingAI());
     }
 
 
@@ -32,7 +32,7 @@ class Game
         $this->myField->createShips();
         $this->myField->placeShipsRandomly();
 
-        $this->enemyField = new Field(new RandomShootingAI());
+        $this->enemyField = new Field(new SmartShootingAI());
         $this->enemyField->createShips();
         $this->enemyField->placeShipsRandomly();
     }
