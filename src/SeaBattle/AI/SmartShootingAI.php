@@ -4,25 +4,25 @@ namespace SeaBattle\AI;
 
 use SeaBattle\Field\Field;
 use SeaBattle\Field\Slot;
-use SeaBattle\AI\RandomShootingAI;
 
 
 class SmartShootingAI implements IShootingAI
 {
     const SHOOT_HORIZONTALLY = 0;
-    const SHOOT_VERTIACALLY = 1;
+    const SHOOT_VERTICALLY = 1;
     const SHOOT_BIDIRECTIONALLY = 2;
 
     private $partsOfdamagedShip = [];
-//    private $smellBlood = false;
     private $variantsForNextShot = [];
     private $shootingDirection = self::SHOOT_BIDIRECTIONALLY;
     private $randomShooter;
+
 
     public function __construct()
     {
         $this->randomShooter = new RandomShootingAI();
     }
+
 
     public function calculateCoordsForShooting($slots, $ships = null)
     {
@@ -49,11 +49,9 @@ class SmartShootingAI implements IShootingAI
             $isShipGoingToDie = $ship->getSize() === $ship->getHits() + 1;
 
             if ($isShipGoingToDie) {
-//                $this->smellBlood = false;
                 $this->partsOfdamagedShip = [];
                 $this->shootingDirection = self::SHOOT_BIDIRECTIONALLY;
             } else {
-//                $this->smellBlood = true;
                 $this->partsOfdamagedShip[] = [
                     'x' =>  $x,
                     'y' => $y
@@ -75,7 +73,7 @@ class SmartShootingAI implements IShootingAI
         $secondPart = $this->partsOfdamagedShip[1];
 
         if ($firstPart['x'] === $secondPart['x']) {
-            $this->shootingDirection = self::SHOOT_VERTIACALLY;
+            $this->shootingDirection = self::SHOOT_VERTICALLY;
         } else {
             $this->shootingDirection = self::SHOOT_HORIZONTALLY;
         }
@@ -85,23 +83,11 @@ class SmartShootingAI implements IShootingAI
     public function calculateAllVariantsForNextShot($slots)
     {
         foreach ($this->partsOfdamagedShip as $shipPart) {
-            /*if ($this->shootingDirection === self::SHOOT_HORIZONTALLY) {
-                $leftSlotX = $shipPart['x'] - 1;
-                $leftSlotY = $shipPart['y'];
-
-                $rightSlotX = $shipPart['x'] + 1;
-                $rightSlotY = $shipPart['y'];
-
-                if ($leftSlotX >= 0 || $rightSlotX < Field::WIDTH) {
-                    $this->addNewVariants();
-                }
-            }*/
-
             switch ($this->shootingDirection) {
                 case self::SHOOT_HORIZONTALLY:
                     $this->addNewVariantsForHorizontalShooting($slots, $shipPart);
                     break;
-                case self::SHOOT_VERTIACALLY:
+                case self::SHOOT_VERTICALLY:
                     $this->addNewVariantsForVerticalShooting($slots, $shipPart);
                     break;
                 case self::SHOOT_BIDIRECTIONALLY:
@@ -179,4 +165,5 @@ class SmartShootingAI implements IShootingAI
             }
         }
     }
+
 }

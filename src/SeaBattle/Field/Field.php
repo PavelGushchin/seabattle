@@ -94,31 +94,10 @@ class Field
 
     private function isSpaceAroundShipIsEmpty($ship)
     {
-        $checkedAreaStartX = $ship->getStartX() - 1;
-        $checkedAreaStartY = $ship->getStartY() - 1;
+        $checkedArea = $this->getAreaAroundShip($ship->getId());
 
-        if ($checkedAreaStartX < 0) {
-            $checkedAreaStartX = 0;
-        }
-
-        if ($checkedAreaStartY < 0) {
-            $checkedAreaStartY = 0;
-        }
-
-
-        $checkedAreaEndX = $ship->getEndX() + 1;
-        $checkedAreaEndY = $ship->getEndY() + 1;
-
-        if ($checkedAreaEndX >= self::WIDTH) {
-            $checkedAreaEndX = self::WIDTH - 1;
-        }
-
-        if ($checkedAreaEndY >= self::HEIGT) {
-            $checkedAreaEndY = self::HEIGT - 1;
-        }
-
-        for ($i = $checkedAreaStartX; $i <= $checkedAreaEndX; $i++) {
-            for ($j = $checkedAreaStartY; $j <= $checkedAreaEndY; $j++) {
+        for ($i = $checkedArea['startX']; $i <= $checkedArea['endX']; $i++) {
+            for ($j = $checkedArea['startY']; $j <= $checkedArea['endY']; $j++) {
                 if ($this->slots[$i][$j]->getState() === Slot::THERE_IS_A_SHIP) {
                     return false;
                 }
@@ -126,6 +105,42 @@ class Field
         }
 
         return true;
+    }
+
+
+    private function getAreaAroundShip($shipId)
+    {
+        $ship = $this->ships[$shipId];
+
+        $areaStartX = $ship->getStartX() - 1;
+        $areaStartY = $ship->getStartY() - 1;
+
+        if ($areaStartX < 0) {
+            $areaStartX = 0;
+        }
+
+        if ($areaStartY < 0) {
+            $areaStartY = 0;
+        }
+
+
+        $areaEndX = $ship->getEndX() + 1;
+        $areaEndY = $ship->getEndY() + 1;
+
+        if ($areaEndX >= self::WIDTH) {
+            $areaEndX = self::WIDTH - 1;
+        }
+
+        if ($areaEndY >= self::HEIGT) {
+            $areaEndY = self::HEIGT - 1;
+        }
+
+        return [
+            'startX' => $areaStartX,
+            'startY' => $areaStartY,
+            'endX' => $areaEndX,
+            'endY' => $areaEndY
+        ];
     }
 
 
@@ -153,6 +168,9 @@ class Field
             case Slot::SLOT_IS_UNCOVERED:
                 $slot->setState(Slot::PLAYER_MISSED);
                 break;
+            case Slot::SLOT_IS_EMPTY:
+                $slot->setState(Slot::PLAYER_MISSED);
+                break;
             case Slot::THERE_IS_A_SHIP:
                 $shipId = $slot->getShipId();
                 $ship = $this->ships[$shipId];
@@ -161,6 +179,16 @@ class Field
 
                 if ($isShipDead) {
                     $this->deadShips++;
+
+                    $areaAroundShip = $this->getAreaAroundShip($shipId);
+
+                    for ($i = $areaAroundShip['startX']; $i <= $areaAroundShip['endX']; $i++) {
+                        for ($j = $areaAroundShip['startY']; $j <= $areaAroundShip['endY']; $j++) {
+                            if ($this->slots[$i][$j]->getState() === Slot::SLOT_IS_UNCOVERED) {
+                                $this->slots[$i][$j]->setState(Slot::SLOT_IS_EMPTY);
+                            }
+                        }
+                    }
 
                     for ($i = $ship->getStartX(); $i <= $ship->getEndX(); $i++) {
                         for ($j = $ship->getStartY(); $j <= $ship->getEndY(); $j++) {
@@ -186,10 +214,8 @@ class Field
 
                 switch($this->slots[$i][$j]->getState()) {
                     case Slot::SLOT_IS_UNCOVERED:
-                        echo 'class="uncovered"';
-                        break;
                     case Slot::SLOT_IS_EMPTY:
-                        echo 'class="empty"';
+                        echo 'class="uncovered"';
                         break;
                     case Slot::PLAYER_MISSED:
                         echo 'class="missed"';
