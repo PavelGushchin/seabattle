@@ -80,7 +80,7 @@ class SmartShootingAI implements IShootingAI
     }
 
 
-    public function calculateAllVariantsForNextShot($slots)
+    private function calculateAllVariantsForNextShot($slots)
     {
         foreach ($this->partsOfdamagedShip as $shipPart) {
             switch ($this->shootingDirection) {
