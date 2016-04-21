@@ -24,6 +24,11 @@ th, td {
     margin: 0 15px;
 }
 
+#enemyField td.uncovered {
+    /*cursor: url('../img/cross.png'), pointer;*/
+    cursor: pointer;
+}
+
 #myShips, #myShips h3 {
     text-align: left;
 }
@@ -52,6 +57,11 @@ th, td {
 }
 .dead {
     background-color: red;
+}
+.empty {
+    background-image: url('../img/empty-slot.png');
+    background-position: center;
+    background-repeat: no-repeat;
 }
 #victory {
     color: green;

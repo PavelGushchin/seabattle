@@ -32,21 +32,36 @@ $myField = $game->getMyField();
 $enemyField = $game->getEnemyField();
 
 if (isset($_GET['x']) && isset($_GET['y'])) {
-    if (!$game->isGameover()) {
+    if (!$game->isGameover() && $game->getTurn() === Game::MY_TURN) {
         $x = filter_input(INPUT_GET, 'x', FILTER_SANITIZE_NUMBER_INT);
         $y = filter_input(INPUT_GET, 'y', FILTER_SANITIZE_NUMBER_INT);
-        $game->shootingTo($enemyField, $x, $y);
+
+        $shipWasHit = $game->shootingTo($enemyField, $x, $y);
+
+        if ($shipWasHit) {
+            $game->setTurn(Game::MY_TURN);
+        } else {
+            $game->passTurnToNextPlayer();
+        }
     }
 
     if (!$game->isGameover()) {
         $shootingAI = $enemyField->getShootingAI();
 
-        $coords = $shootingAI->calculateCoordsForShooting(
-            $myField->getSlots(),
-            $myField->getShips()
-        );
+        while ($game->getTurn() === Game::ENEMY_TURN) {
+            $coords = $shootingAI->calculateCoordsForShooting(
+                $myField->getSlots(),
+                $myField->getShips()
+            );
 
-        $game->shootingTo($myField, $coords['x'], $coords['y'], true);
+            $shipWasHit = $game->shootingTo($myField, $coords['x'], $coords['y'], true);
+
+            if ($shipWasHit) {
+                $game->setTurn(Game::ENEMY_TURN);
+            } else {
+                $game->passTurnToNextPlayer();
+            }
+        }
     }
 }
 

@@ -159,9 +159,10 @@ class Field
     {
         if ($x < 0 || $x >= self::WIDTH ||
             $y < 0 || $y >= self::HEIGT) {
-            return;
+            return false;
         }
 
+        $shipWasHit = false;
         $slot = $this->getSlot($x, $y);
 
         switch ($slot->getState()) {
@@ -199,8 +200,11 @@ class Field
                     $slot->setState(Slot::SHIP_WAS_HIT);
                 }
 
+                $shipWasHit = true;
                 break;
         }
+
+        return $shipWasHit;
     }
 
 
@@ -214,8 +218,10 @@ class Field
 
                 switch($this->slots[$i][$j]->getState()) {
                     case Slot::SLOT_IS_UNCOVERED:
-                    case Slot::SLOT_IS_EMPTY:
                         echo 'class="uncovered"';
+                        break;
+                    case Slot::SLOT_IS_EMPTY:
+                        echo 'class="empty"';
                         break;
                     case Slot::PLAYER_MISSED:
                         echo 'class="missed"';

@@ -13,10 +13,14 @@ class Game
     const I_AM_WINNER = 1;
     const ENEMY_IS_WINNER = 2;
 
+    const MY_TURN = 0;
+    const ENEMY_TURN = 1;
+
     private $myField;
     private $enemyField;
     private $gameover = false;
     private $winner = self::NO_WINNER;
+    private $turn = self::MY_TURN;
 
 
     public function __construct()
@@ -43,7 +47,7 @@ class Game
 
     public function shootingTo(Field $attackedField, $x, $y, $isEnemy = false)
     {
-        $attackedField->handleShot($x, $y);
+        $shipWasHit = $attackedField->handleShot($x, $y);
 
         if ($attackedField->allShipsAreDead()) {
             $this->setGameover(true);
@@ -54,6 +58,8 @@ class Game
                 $this->setWinner(Game::ENEMY_IS_WINNER);
             }
         }
+
+        return $shipWasHit;
     }
 
 
@@ -87,5 +93,28 @@ class Game
     public function setWinner($winner)
     {
         $this->winner = $winner;
+    }
+
+
+    public function getTurn()
+    {
+        return $this->turn;
+    }
+
+    public function setTurn($turn)
+    {
+        $this->turn = $turn;
+    }
+
+    public function passTurnToNextPlayer()
+    {
+        switch ($this->getTurn()) {
+            case self::MY_TURN:
+                $this->turn = self::ENEMY_TURN;
+                break;
+            case self::ENEMY_TURN:
+                $this->turn = self::MY_TURN;
+                break;
+        }
     }
 }
