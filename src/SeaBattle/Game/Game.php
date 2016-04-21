@@ -35,6 +35,9 @@ class Game
         $this->enemyField = new Field(new SmartShootingAI());
         $this->enemyField->createShips();
         $this->enemyField->placeShipsRandomly();
+
+        $this->winner = self::NO_WINNER;
+        $this->gameover = false;
     }
 
 

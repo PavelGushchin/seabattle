@@ -5,7 +5,9 @@ $(function() {
         if (uncovered) {
             var x = $(this).data('x');
             var y = $(this).data('y');
-            window.location = 'http://' + document.location.host + '?x=' + x + '&y=' + y;
+
+            var url = window.location.href.split('?')[0];
+            window.location = url + '?x=' + x + '&y=' + y;
         }
     });
 });
