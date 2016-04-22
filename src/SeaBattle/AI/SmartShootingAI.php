@@ -26,11 +26,10 @@ class SmartShootingAI implements IShootingAI
 
     public function calculateCoordsForShooting($slots, $ships = null)
     {
-        $this->variantsForNextShot = [];
-
         if ( empty($this->partsOfdamagedShip) ) {
             $coords = $this->randomShooter->calculateCoordsForShooting($slots);
         } else {
+            $this->variantsForNextShot = [];
             $this->calculateAllVariantsForNextShot($slots);
 
             shuffle($this->variantsForNextShot);

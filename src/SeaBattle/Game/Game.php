@@ -5,6 +5,7 @@ namespace SeaBattle\Game;
 use SeaBattle\Field\Field;
 use SeaBattle\AI\SmartShootingAI;
 use SeaBattle\AI\RandomShootingAI;
+use SeaBattle\AI\ShootingWithStrategyAI;
 
 
 class Game

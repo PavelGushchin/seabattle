@@ -123,4 +123,10 @@ class Ship
         return $this->hits;
     }
 
+
+    public function isDead()
+    {
+        return $this->isDead;
+    }
+
 }
