@@ -28,9 +28,9 @@ class Field
     {
         $this->shootingAI = $shootingAI;
 
-        for ($i = 0; $i < self::WIDTH; $i++) {
-            for ($j = 0; $j < self::HEIGT; $j++) {
-                $this->slots[$i][$j] = new Slot();
+        for ($x = 0; $x < self::WIDTH; $x++) {
+            for ($y = 0; $y < self::HEIGT; $y++) {
+                $this->slots[$x][$y] = new Slot();
             }
         }
     }
@@ -96,9 +96,9 @@ class Field
     {
         $checkedArea = $this->getAreaAroundShip($ship->getId());
 
-        for ($i = $checkedArea['startX']; $i <= $checkedArea['endX']; $i++) {
-            for ($j = $checkedArea['startY']; $j <= $checkedArea['endY']; $j++) {
-                if ($this->slots[$i][$j]->getState() === Slot::THERE_IS_A_SHIP) {
+        for ($x = $checkedArea['startX']; $x <= $checkedArea['endX']; $x++) {
+            for ($y = $checkedArea['startY']; $y <= $checkedArea['endY']; $y++) {
+                if ($this->slots[$x][$y]->getState() === Slot::THERE_IS_A_SHIP) {
                     return false;
                 }
             }
@@ -146,10 +146,10 @@ class Field
 
     private function placeShipOnMap($ship)
     {
-        for ($i = $ship->getStartX(); $i <= $ship->getEndX(); $i++) {
-            for ($j = $ship->getStartY(); $j <= $ship->getEndY(); $j++) {
-                $this->slots[$i][$j]->setState(Slot::THERE_IS_A_SHIP);
-                $this->slots[$i][$j]->setShipId($ship->getId());
+        for ($x = $ship->getStartX(); $x <= $ship->getEndX(); $x++) {
+            for ($y = $ship->getStartY(); $y <= $ship->getEndY(); $y++) {
+                $this->slots[$x][$y]->setState(Slot::THERE_IS_A_SHIP);
+                $this->slots[$x][$y]->setShipId($ship->getId());
             }
         }
     }
@@ -210,13 +210,13 @@ class Field
 
     public function draw($isEnemy = false)
     {
-        for ($i = 0; $i < self::WIDTH; $i++) {
+        for ($y = 0; $y < self::HEIGT; $y++) {
             echo '<tr>';
 
-            for ($j = 0; $j < self::HEIGT; $j++) {
+            for ($x = 0; $x < self::WIDTH; $x++) {
                 echo '<td ';
 
-                switch($this->slots[$i][$j]->getState()) {
+                switch($this->slots[$x][$y]->getState()) {
                     case Slot::SLOT_IS_UNCOVERED:
                         echo 'class="uncovered"';
                         break;
@@ -239,7 +239,7 @@ class Field
                         break;
                 }
 
-                echo ' data-x=' . $i . ' data-y=' . $j . '></td>';
+                echo ' data-x=' . $x . ' data-y=' . $y . '></td>';
             }
 
             echo '</tr>';

@@ -15,15 +15,7 @@ class ShootingWithStrategyAI implements IShootingAI
     private $partsOfdamagedShip = [];
     private $variantsForNextShot = [];
     private $shootingDirection = self::SHOOT_BIDIRECTIONALLY;
-//    private $randomShooter;
     private $valuesForSlots;
-
-
-    public function __construct()
-    {
-//        $this->randomShooter = new RandomShootingAI();
-    }
-
 
     public function calculateCoordsForShooting($slots, $ships = null)
     {
@@ -38,18 +30,16 @@ class ShootingWithStrategyAI implements IShootingAI
             $this->calculateAllVariantsForSmartShot($slots);
         }
 
-
         shuffle($this->variantsForNextShot);
 
         usort($this->variantsForNextShot, function($a, $b) {
-            return $a['value'] - $b['value'];
+            return $b['value'] - $a['value'];
         });
 
         $coords = array_shift($this->variantsForNextShot);
 
         $x = $coords['x'];
         $y = $coords['y'];
-
 
         $slotState = $slots[$x][$y]->getState();
 
@@ -74,6 +64,18 @@ class ShootingWithStrategyAI implements IShootingAI
             }
         }
 
+
+        /*for ($j = 0; $j < Field::HEIGT; $j++) {
+            for($i = 0; $i < Field::WIDTH; $i++) {
+                echo "{$this->valuesForSlots[$i][$j]} ";
+            }
+
+            echo "<br>";
+        }
+
+        echo "<br><br>";*/
+
+
         return $coords;
     }
 
@@ -95,12 +97,10 @@ class ShootingWithStrategyAI implements IShootingAI
     {
         for($i = 0; $i < Field::WIDTH; $i++) {
             for($j = 0; $j < Field::HEIGT; $j++) {
-                $isSlotAvailableForShooting = $slots[$i][$j]->getState() === (
-                        Slot::SLOT_IS_UNCOVERED ||
-                        Slot::THERE_IS_A_SHIP
-                    );
+                $slotState = $slots[$i][$j]->getState();
 
-                if($isSlotAvailableForShooting) {
+                if($slotState === Slot::SLOT_IS_UNCOVERED ||
+                    $slotState === Slot::THERE_IS_A_SHIP) {
                     $this->variantsForNextShot[] = [
                         'x' => $i,
                         'y' => $j,
@@ -159,7 +159,7 @@ class ShootingWithStrategyAI implements IShootingAI
                 $this->variantsForNextShot[] = [
                     'x' => $rightSlotX,
                     'y' => $rightSlotY,
-                    'value' => $this->valuesForSlots[$leftSlotX][$leftSlotY]
+                    'value' => $this->valuesForSlots[$rightSlotX][$rightSlotY]
                 ];
             }
         }
@@ -179,7 +179,7 @@ class ShootingWithStrategyAI implements IShootingAI
                 $this->variantsForNextShot[] = [
                     'x' => $topSlotX,
                     'y' => $topSlotY,
-                    'value' => $this->valuesForSlots[$leftSlotX][$leftSlotY]
+                    'value' => $this->valuesForSlots[$topSlotX][$topSlotY]
                 ];
             }
         }
@@ -195,7 +195,7 @@ class ShootingWithStrategyAI implements IShootingAI
                 $this->variantsForNextShot[] = [
                     'x' => $bottomSlotX,
                     'y' => $bottomSlotY,
-                    'value' => $this->valuesForSlots[$leftSlotX][$leftSlotY]
+                    'value' => $this->valuesForSlots[$bottomSlotX][$bottomSlotY]
                 ];
             }
         }
@@ -208,31 +208,41 @@ class ShootingWithStrategyAI implements IShootingAI
             for ($j = 0; $j < Field::HEIGT; $j++) {
                 $this->valuesForSlots[$i][$j] = 0;
 
+                if ($slots[$i][$j]->getState() !== Slot::SLOT_IS_UNCOVERED &&
+                    $slots[$i][$j]->getState() !== Slot::THERE_IS_A_SHIP) {
+                    continue;
+                }
+
                 $leftUncoveredSlots = $this->getAmountOfLeftUncoveredSlots($slots, $i, $j);
                 $rightUncoveredSlots = $this->getAmountOfRightUncoveredSlots($slots, $i, $j);
                 $topUncoveredSlots = $this->getAmountOfTopUncoveredSlots($slots, $i, $j);
-                $bottimUncoveredSlots = $this->getAmountOfBottomUncoveredSlots($slots, $i, $j);
+                $bottomUncoveredSlots = $this->getAmountOfBottomUncoveredSlots($slots, $i, $j);
 
                 $horizontalUncoveredSlots = $leftUncoveredSlots + $rightUncoveredSlots + 1;
-                $verticalUncoveredSlots = $topUncoveredSlots + $bottimUncoveredSlots + 1;
+                $verticalUncoveredSlots = $topUncoveredSlots + $bottomUncoveredSlots + 1;
 
                 foreach($ships as $ship) {
                     if(!$ship->isDead()) {
 //                        $isShipCanFit = $ship->getSize() <= ($horizontalUncoveredSlots || $verticalUncoveredSlots);
 
+//                        $shipSize = $ship->getSize();
                         if ($ship->getSize() <= $horizontalUncoveredSlots) {
                             $this->valuesForSlots[$i][$j] += $ship->getSize();
                         }
+
                         if ($ship->getSize() <= $verticalUncoveredSlots) {
                             $this->valuesForSlots[$i][$j] += $ship->getSize();
                         }
                     }
                 }
+
+//                echo "{$this->valuesForSlots[$i][$j]} ";
             }
 
+//            echo "<br>";
         }
 
-
+//        echo "<br><br>";
     }
 
 
@@ -240,13 +250,11 @@ class ShootingWithStrategyAI implements IShootingAI
     {
         $amount = 0;
 
-        for($i = $y - 1; $i >= 0; $i--) {
-            $isSlotAvailableForShooting = $slots[$x][$i]->getState() === (
-                Slot::SLOT_IS_UNCOVERED ||
-                Slot::THERE_IS_A_SHIP
-            );
+        for($i = $x - 1; $i >= 0; $i--) {
+            $slotState = $slots[$i][$y]->getState();
 
-            if($isSlotAvailableForShooting) {
+            if($slotState === Slot::SLOT_IS_UNCOVERED ||
+                $slotState === Slot::THERE_IS_A_SHIP) {
                 $amount++;
             } else {
                 break;
@@ -262,12 +270,10 @@ class ShootingWithStrategyAI implements IShootingAI
         $amount = 0;
 
         for($i = $x + 1; $i < Field::WIDTH; $i++) {
-            $isSlotAvailableForShooting = $slots[$i][$y]->getState() === (
-                    Slot::SLOT_IS_UNCOVERED ||
-                    Slot::THERE_IS_A_SHIP
-                );
+            $slotState = $slots[$i][$y]->getState();
 
-            if($isSlotAvailableForShooting) {
+            if($slotState === Slot::SLOT_IS_UNCOVERED ||
+                $slotState === Slot::THERE_IS_A_SHIP) {
                 $amount++;
             } else {
                 break;
@@ -283,12 +289,10 @@ class ShootingWithStrategyAI implements IShootingAI
         $amount = 0;
 
         for($j = $y - 1; $j >= 0; $j--) {
-            $isSlotAvailableForShooting = $slots[$x][$j]->getState() === (
-                    Slot::SLOT_IS_UNCOVERED ||
-                    Slot::THERE_IS_A_SHIP
-                );
+            $slotState = $slots[$x][$j]->getState();
 
-            if($isSlotAvailableForShooting) {
+            if($slotState === Slot::SLOT_IS_UNCOVERED ||
+                $slotState === Slot::THERE_IS_A_SHIP) {
                 $amount++;
             } else {
                 break;
@@ -304,12 +308,10 @@ class ShootingWithStrategyAI implements IShootingAI
         $amount = 0;
 
         for($j = $y + 1; $j < Field::HEIGT; $j++) {
-            $isSlotAvailableForShooting = $slots[$x][$j]->getState() === (
-                    Slot::SLOT_IS_UNCOVERED ||
-                    Slot::THERE_IS_A_SHIP
-                );
+            $slotState = $slots[$x][$j]->getState();
 
-            if($isSlotAvailableForShooting) {
+            if($slotState === Slot::SLOT_IS_UNCOVERED ||
+                $slotState === Slot::THERE_IS_A_SHIP) {
                 $amount++;
             } else {
                 break;

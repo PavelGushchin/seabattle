@@ -27,7 +27,7 @@ class Game
     public function __construct()
     {
         $this->myField = new Field();
-        $this->enemyField = new Field(new SmartShootingAI());
+        $this->enemyField = new Field();
     }
 
 
@@ -37,13 +37,28 @@ class Game
         $this->myField->createShips();
         $this->myField->placeShipsRandomly();
 
-        $this->enemyField = new Field(new SmartShootingAI());
+        $this->enemyField = new Field(new ShootingWithStrategyAI());
         $this->enemyField->createShips();
         $this->enemyField->placeShipsRandomly();
 
         $this->winner = self::NO_WINNER;
         $this->gameover = false;
     }
+
+
+    /*public function startAutobattleGame()
+    {
+        $this->myField = new Field(new SmartShootingAI());
+        $this->myField->createShips();
+        $this->myField->placeShipsRandomly();
+
+        $this->enemyField = new Field(new ShootingWithStrategyAI());
+        $this->enemyField->createShips();
+        $this->enemyField->placeShipsRandomly();
+
+        $this->winner = self::NO_WINNER;
+        $this->gameover = false;
+    }*/
 
 
     public function shootingTo(Field $attackedField, $x, $y, $isEnemy = false)
