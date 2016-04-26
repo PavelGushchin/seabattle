@@ -46,7 +46,7 @@ class Game
     }
 
 
-    /*public function startAutobattleGame()
+    public function startAutobattleGame()
     {
         $this->myField = new Field(new SmartShootingAI());
         $this->myField->createShips();
@@ -58,7 +58,7 @@ class Game
 
         $this->winner = self::NO_WINNER;
         $this->gameover = false;
-    }*/
+    }
 
 
     public function shootingTo(Field $attackedField, $x, $y, $isEnemy = false)

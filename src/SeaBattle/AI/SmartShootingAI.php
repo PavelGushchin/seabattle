@@ -165,4 +165,9 @@ class SmartShootingAI implements IShootingAI
         }
     }
 
+    public function __toString()
+    {
+        return 'Smart algorithm';
+    }
+
 }

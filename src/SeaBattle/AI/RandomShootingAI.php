@@ -21,4 +21,9 @@ class RandomShootingAI implements IShootingAI
             'y' => $y
         ];
     }
+
+    public function __toString()
+    {
+        return 'Random algorithm';
+    }
 }

@@ -20,7 +20,6 @@ class ShootingWithStrategyAI implements IShootingAI
     public function calculateCoordsForShooting($slots, $ships = null)
     {
         $this->variantsForNextShot = [];
-        $this->valuesForSlots = [];
         $this->setValuesForSlots($slots, $ships);
 
 
@@ -204,6 +203,8 @@ class ShootingWithStrategyAI implements IShootingAI
 
     private function setValuesForSlots($slots, $ships)
     {
+        $this->valuesForSlots = [];
+
         for($i = 0; $i < Field::WIDTH; $i++) {
             for ($j = 0; $j < Field::HEIGT; $j++) {
                 $this->valuesForSlots[$i][$j] = 0;
@@ -319,6 +320,11 @@ class ShootingWithStrategyAI implements IShootingAI
         }
 
         return $amount;
+    }
+
+    public function __toString()
+    {
+        return 'Strategy algorithm';
     }
 
 }

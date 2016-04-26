@@ -193,7 +193,7 @@ class Field
 
                     for ($i = $ship->getStartX(); $i <= $ship->getEndX(); $i++) {
                         for ($j = $ship->getStartY(); $j <= $ship->getEndY(); $j++) {
-                            $this->getSlot($i,$j)->setState(Slot::SHIP_IS_DEAD);
+                            $this->slots[$i][$j]->setState(Slot::SHIP_IS_DEAD);
                         }
                     }
                 } else {

@@ -9,6 +9,8 @@ use SeaBattle\Field\Field;
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+set_time_limit(0);
+
 
 session_start();
 
@@ -66,14 +68,14 @@ if (isset($_GET['x']) && isset($_GET['y'])) {
 }
 
 
-/*if (isset($_GET['autobattle'])) {
+if (isset($_GET['autobattle'])) {
     $numberOfGames = filter_input(INPUT_GET, 'autobattle', FILTER_SANITIZE_NUMBER_INT);
     $currentGame = 1;
 
     $firstAlgorithmWins = 0;
     $secondAlgorithmWins = 0;
 
-//    while($currentGame <= $numberOfGames) {
+    while($currentGame <= $numberOfGames) {
 
         $game = new Game();
         $game->startAutobattleGame();
@@ -82,7 +84,7 @@ if (isset($_GET['x']) && isset($_GET['y'])) {
         $enemyField = $game->getEnemyField();
 
         while(!$game->isGameover()) {
-            while ($game->getTurn() === Game::MY_TURN) {
+            while (!$game->isGameover() && $game->getTurn() === Game::MY_TURN) {
                 $shootingAI = $myField->getShootingAI();
                 $coords = $shootingAI->calculateCoordsForShooting(
                     $enemyField->getSlots(),
@@ -98,7 +100,7 @@ if (isset($_GET['x']) && isset($_GET['y'])) {
                 }
             }
 
-            while ($game->getTurn() === Game::ENEMY_TURN) {
+            while (!$game->isGameover() && $game->getTurn() === Game::ENEMY_TURN) {
                 $shootingAI = $enemyField->getShootingAI();
                 $coords = $shootingAI->calculateCoordsForShooting(
                     $myField->getSlots(),
@@ -127,11 +129,11 @@ if (isset($_GET['x']) && isset($_GET['y'])) {
 
 
         $currentGame++;
-//    }
+    }
 
-    echo "First algorithm: $firstAlgorithmWins<br>";
-    echo "Second algorithm: $secondAlgorithmWins<br>";
-}*/
+    echo "{$myField->getShootingAI()}: $firstAlgorithmWins<br>";
+    echo "{$enemyField->getShootingAI()}: $secondAlgorithmWins<br>";
+}
 
 
 $_SESSION['game'] = serialize($game);
