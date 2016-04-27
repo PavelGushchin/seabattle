@@ -6,7 +6,7 @@ use SeaBattle\Field\Field;
 use SeaBattle\Field\Slot;
 
 
-class ShootingWithStrategyAI implements IShootingAI
+class ShootingWithStrategyImprovedAI implements IShootingAI
 {
     const SHOOT_HORIZONTALLY = 0;
     const SHOOT_VERTICALLY = 1;
@@ -16,6 +16,14 @@ class ShootingWithStrategyAI implements IShootingAI
     private $variantsForNextShot = [];
     private $shootingDirection = self::SHOOT_BIDIRECTIONALLY;
     private $valuesForSlots;
+    private $theBiggestShipAlive = 4;
+    /*private $mapForHantingOnShips = [
+        2 => [],
+        3 => [],
+        4 => [
+
+        ]
+    ];*/
 
     public function calculateCoordsForShooting($slots, $ships = null)
     {
