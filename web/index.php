@@ -75,6 +75,9 @@ if (isset($_GET['autobattle'])) {
     $firstAlgorithmWins = 0;
     $secondAlgorithmWins = 0;
 
+    $firstAlgorithmTotalShots = 0;
+    $secondAlgorithmTotalShots = 0;
+
     while($currentGame <= $numberOfGames) {
 
         $game = new Game();
@@ -127,12 +130,20 @@ if (isset($_GET['autobattle'])) {
                 break;
         }
 
+        $firstAlgorithmTotalShots += $enemyField->getTotalShots();
+        $secondAlgorithmTotalShots += $myField->getTotalShots();
 
         $currentGame++;
     }
 
-    echo "{$myField->getShootingAI()}: $firstAlgorithmWins<br>";
-    echo "{$enemyField->getShootingAI()}: $secondAlgorithmWins<br>";
+    $firstAlgorithmAverageShotsToWin = $firstAlgorithmTotalShots / $numberOfGames;
+    $secondAlgorithmAverageShotsToWin = $secondAlgorithmTotalShots / $numberOfGames;
+
+    echo "{$myField->getShootingAI()}: wins - $firstAlgorithmWins<br>";
+
+    echo "{$enemyField->getShootingAI()}: wins - $secondAlgorithmWins<br>";
+    /*echo "{$enemyField->getShootingAI()}: wins - $secondAlgorithmWins (average shots -
+            $secondAlgorithmAverageShotsToWin) <br>";*/
 }
 
 

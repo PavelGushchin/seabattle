@@ -16,6 +16,7 @@ class Field
     private $shootingAI;
     private $totalAmountOfShips = 0;
     private $deadShips = 0;
+    private $totalShots = 0;
     private $shipsToBeCreated = [
         ['size' => 4, 'amount' => 1],
         ['size' => 3, 'amount' => 2],
@@ -204,6 +205,8 @@ class Field
                 break;
         }
 
+        $this->totalShots++;
+
         return $shipWasHit;
     }
 
@@ -276,5 +279,11 @@ class Field
     public function getShootingAI()
     {
         return $this->shootingAI;
+    }
+
+
+    public function getTotalShots()
+    {
+        return $this->totalShots;
     }
 }

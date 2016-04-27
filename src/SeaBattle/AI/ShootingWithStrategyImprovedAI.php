@@ -20,8 +20,7 @@ class ShootingWithStrategyAI implements IShootingAI
     public function calculateCoordsForShooting($slots, $ships = null)
     {
         $this->variantsForNextShot = [];
-        $this->setValuesForSlots($slots, $ships);
-
+//        $this->setValuesForSlots($slots, $ships);
 
         if ( empty($this->partsOfdamagedShip) ) {
             $this->calculateAllVariantsForRandomShot($slots);
@@ -29,13 +28,17 @@ class ShootingWithStrategyAI implements IShootingAI
             $this->calculateAllVariantsForSmartShot($slots);
         }
 
-        shuffle($this->variantsForNextShot);
+        /*shuffle($this->variantsForNextShot);
 
         usort($this->variantsForNextShot, function($a, $b) {
             return $b['value'] - $a['value'];
         });
 
-        $coords = array_shift($this->variantsForNextShot);
+        $coords = array_shift($this->variantsForNextShot);*/
+
+        $randomShotVariant = mt_rand(0, count($this->variantsForNextShot));
+        $coords = $this->variantsForNextShot[$randomShotVariant];
+
 
         $x = $coords['x'];
         $y = $coords['y'];
