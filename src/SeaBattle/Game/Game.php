@@ -1,4 +1,10 @@
 <?php
+/*
+ * This file is part of the SeaBattle package.
+ *
+ * (c) Pavel Gushchin, 2016
+ *
+ */
 
 namespace SeaBattle\Game;
 
@@ -6,29 +12,98 @@ use SeaBattle\Field\Field;
 use SeaBattle\AI\ShootingWithStrategyAI;
 
 
+/**
+ * This class is playing a role of the main controller
+ * of the game which connects all pieces of SeaBattle
+ * package together
+ *
+ * @package     SeaBattle
+ * @author      Pavel Gushchin
+ * @copyright   Pavel Gushchin
+ * @license     https://opensource.org/licenses/MIT The MIT License (MIT)
+ * @link        https://bitbucket.org/pavel-gushchin/seabattle
+ */
 class Game
 {
+    /**
+     * @var int Constant which indicates that
+     *          game is still running
+     */
     const NO_WINNER = 0;
+
+    /**
+     * @var int Constant which indicates that
+     *          player is the winner of the game
+     */
     const I_AM_WINNER = 1;
+
+    /**
+     * @var int Constant which indicates that
+     *          CPU is the winner of the game
+     */
     const ENEMY_IS_WINNER = 2;
 
+
+    /**
+     * @var int Constant which indicates that
+     *          next turn is player's
+     */
     const MY_TURN = 0;
+
+    /**
+     * @var int Constant which indicates that
+     *          next turn is CPU's
+     */
     const ENEMY_TURN = 1;
 
+
+    /**
+     * @var Field This variable contains
+     *            player's Battle Field
+     */
     private $myField;
+
+    /**
+     * @var Field This variable contains
+     *            CPU's Battle Field
+     */
     private $enemyField;
+
+    /**
+     * @var bool Is game is over?
+     */
     private $gameover = false;
+
+    /**
+     * @var int Shows who is the winner
+     *          of the game
+     */
     private $winner = self::NO_WINNER;
+
+    /**
+     * @var int Shows whom the next turn is
+     */
     private $turn = self::MY_TURN;
 
 
+    /**
+     * Game constructor.
+     */
     public function __construct()
     {
         $this->myField = new Field();
         $this->enemyField = new Field();
     }
 
-
+    /**
+     * This method creates new blank Battle Fields
+     * for player and CPU
+     *
+     * Also it randomly places ships on that Battle
+     * Fields and assigns default values to some
+     * variables
+     *
+     */
     public function startNewGame()
     {
         $this->myField = new Field();
@@ -43,6 +118,16 @@ class Game
         $this->gameover = false;
     }
 
+    /**
+     * This method is used for shooting to opponent
+     *
+     * @param Field $attackedField Indicates what Battle Field
+     *                             is under the fire
+     * @param int $x Represents horizontal shooting coordinate
+     * @param int $y Represents vertical shooting coordinate
+     * @param bool $isEnemy It is 'true' if CPU is shooting
+     * @return bool Indicates if our shot was successful or not
+     */
     public function shootingTo(Field $attackedField, $x, $y, $isEnemy = false)
     {
         $shipWasHit = $attackedField->handleShot($x, $y);
@@ -60,50 +145,93 @@ class Game
         return $shipWasHit;
     }
 
-
+    /**
+     * Return Battle Field of player
+     *
+     * @return Field
+     */
     public function getMyField()
     {
         return $this->myField;
     }
 
+    /**
+     * Return Battle Field of CPU
+     *
+     * @return Field
+     */
     public function getEnemyField()
     {
         return $this->enemyField;
     }
 
-
+    /**
+     * Returns 'true' if game is over
+     * and 'false' otherwise
+     *
+     * @return bool
+     */
     public function isGameover()
     {
         return $this->gameover;
     }
 
+    /**
+     * Sets value for gameover property
+     *
+     * @param bool $gameover
+     */
     public function setGameover($gameover)
     {
         $this->gameover = $gameover;
     }
 
-
+    /**
+     * Returns value which indicates who is
+     * the winner: player or CPU
+     *
+     * @return int
+     */
     public function getWinner()
     {
         return $this->winner;
     }
 
+    /**
+     * Sets the winner
+     *
+     * @param int $winner
+     */
     public function setWinner($winner)
     {
         $this->winner = $winner;
     }
 
-
+    /**
+     * Returns value which indicates whom
+     * the next turn is: player's or CPU's
+     *
+     * @return int
+     */
     public function getTurn()
     {
         return $this->turn;
     }
 
+    /**
+     * Sets value for next turn
+     *
+     * @param int $turn
+     */
     public function setTurn($turn)
     {
         $this->turn = $turn;
     }
 
+    /**
+     * This method does what it says: passes
+     * turn to next player
+     */
     public function passTurnToNextPlayer()
     {
         switch ($this->getTurn()) {
