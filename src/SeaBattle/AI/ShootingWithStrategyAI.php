@@ -63,18 +63,6 @@ class ShootingWithStrategyAI implements IShootingAI
             }
         }
 
-
-        /*for ($j = 0; $j < Field::HEIGT; $j++) {
-            for($i = 0; $i < Field::WIDTH; $i++) {
-                echo "{$this->valuesForSlots[$i][$j]} ";
-            }
-
-            echo "<br>";
-        }
-
-        echo "<br><br>";*/
-
-
         return $coords;
     }
 
@@ -224,9 +212,6 @@ class ShootingWithStrategyAI implements IShootingAI
 
                 foreach($ships as $ship) {
                     if(!$ship->isDead()) {
-//                        $isShipCanFit = $ship->getSize() <= ($horizontalUncoveredSlots || $verticalUncoveredSlots);
-
-//                        $shipSize = $ship->getSize();
                         if ($ship->getSize() <= $horizontalUncoveredSlots) {
                             $this->valuesForSlots[$i][$j] += $ship->getSize();
                         }
@@ -253,49 +238,8 @@ class ShootingWithStrategyAI implements IShootingAI
                 if ($bottomUncoveredSlots > 0) {
                     $this->valuesForSlots[$i][$j]++;
                 }
-
-
-                /*$areaStartX = $i - 1;
-                $areaStartY = $j - 1;
-
-                if ($areaStartX < 0) {
-                    $areaStartX = 0;
-                }
-
-                if ($areaStartY < 0) {
-                    $areaStartY = 0;
-                }
-
-
-                $areaEndX = $i + 1;
-                $areaEndY = $j + 1;
-
-                if ($areaEndX >= Field::WIDTH) {
-                    $areaEndX = Field::WIDTH - 1;
-                }
-
-                if ($areaEndY >= Field::HEIGT) {
-                    $areaEndY = Field::HEIGT - 1;
-                }
-
-
-                for ($x = $areaStartX; $x <= $areaEndX; $x++) {
-                    for ($y = $areaStartY; $y <= $areaEndY; $y++) {
-                        if ($slots[$x][$y]->getState() === Slot::SLOT_IS_UNCOVERED ||
-                            $slots[$x][$y]->getState() === Slot::THERE_IS_A_SHIP) {
-                            $this->valuesForSlots[$i][$j]++;
-                        }
-                    }
-                }*/
-
-
-//                echo "{$this->valuesForSlots[$i][$j]} ";
             }
-
-//            echo "<br>";
         }
-
-//        echo "<br><br>";
     }
 
 

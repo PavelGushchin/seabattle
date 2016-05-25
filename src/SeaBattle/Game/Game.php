@@ -2,13 +2,8 @@
 
 namespace SeaBattle\Game;
 
-use SeaBattle\AI\MyCustomAI;
-use SeaBattle\AI\SeabattleAIAdapter;
 use SeaBattle\Field\Field;
-use SeaBattle\AI\SmartShootingAI;
-use SeaBattle\AI\RandomShootingAI;
 use SeaBattle\AI\ShootingWithStrategyAI;
-use SeaBattle\AI\FakeShootingAI;
 
 
 class Game
@@ -41,31 +36,12 @@ class Game
         $this->myField->placeShipsRandomly();
 
         $this->enemyField = new Field(new ShootingWithStrategyAI());
-//        $this->enemyField = new Field(new SeabattleAIAdapter(new MyCustomAI()));
         $this->enemyField->createShips();
         $this->enemyField->placeShipsRandomly();
 
         $this->winner = self::NO_WINNER;
         $this->gameover = false;
     }
-
-
-    public function startAutobattleGame()
-    {
-//        $this->myField = new Field(new FakeShootingAI());
-//        $this->myField = new Field(new SmartShootingAI());
-        $this->myField = new Field(new SeabattleAIAdapter(new MyCustomAI()));
-        $this->myField->createShips();
-        $this->myField->placeShipsRandomly();
-
-        $this->enemyField = new Field(new ShootingWithStrategyAI());
-        $this->enemyField->createShips();
-        $this->enemyField->placeShipsRandomly();
-
-        $this->winner = self::NO_WINNER;
-        $this->gameover = false;
-    }
-
 
     public function shootingTo(Field $attackedField, $x, $y, $isEnemy = false)
     {
