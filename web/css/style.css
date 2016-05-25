@@ -48,29 +48,29 @@ th, td {
 .missed {
     background-color: gray;
 }
+
 .ship {
     background-color: green;
 }
+
 .hit {
     background-color: darkorange;
-    /*background-image: url('../img/animated-fire-image-0299.gif');
-    background-position: center;
-    background-repeat: no-repeat;*/
 }
+
 .dead {
     background-color: red;
-    /*background-image: url('../img/animated-fire-image-0299.gif');
-    background-position: center;
-    background-repeat: no-repeat;*/
 }
+
 .empty {
     background-image: url('../img/empty-slot.png');
     background-position: center;
     background-repeat: no-repeat;
 }
+
 #victory {
     color: green;
 }
+
 #defeat {
     color: red;
 }
