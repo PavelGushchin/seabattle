@@ -6,7 +6,7 @@ use SeaBattle\Field\Field;
 use SeaBattle\Field\Slot;
 
 
-class SmartShootingAI implements IShootingAI
+class SmartShootingAI implements ShootingAIInterface
 {
     const SHOOT_HORIZONTALLY = 0;
     const SHOOT_VERTICALLY = 1;

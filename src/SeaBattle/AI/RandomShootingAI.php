@@ -5,7 +5,7 @@ namespace SeaBattle\AI;
 use SeaBattle\Field\Slot;
 use SeaBattle\Field\Field;
 
-class RandomShootingAI implements IShootingAI
+class RandomShootingAI implements ShootingAIInterface
 {
     public function calculateCoordsForShooting($slots, $ships = null)
     {

@@ -12,7 +12,7 @@
 namespace SeaBattle\Field;
 
 use SeaBattle\Ship\Ship;
-use SeaBattle\AI\IShootingAI;
+use SeaBattle\AI\ShootingAIInterface;
 
 /**
  * Field represents battle field on which player can locate ships.
@@ -43,7 +43,7 @@ class Field
     protected $ships = [];
 
     /**
-     * @var IShootingAI Contains AI for CPU
+     * @var ShootingAIInterface Contains AI for CPU
      */
     protected $shootingAI;
 
@@ -76,9 +76,9 @@ class Field
     /**
      * Field constructor.
      *
-     * @param IShootingAI|null $shootingAI
+     * @param ShootingAIInterface|null $shootingAI
      */
-    public function __construct(IShootingAI $shootingAI = null)
+    public function __construct(ShootingAIInterface $shootingAI = null)
     {
         $this->shootingAI = $shootingAI;
 
@@ -290,7 +290,7 @@ class Field
     /**
      * Returns current AI of CPU
      *
-     * @return IShootingAI|null
+     * @return ShootingAIInterface|null
      */
     public function getShootingAI()
     {
