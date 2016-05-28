@@ -1,11 +1,25 @@
 <?php
 
+/*
+ * This file is part of the SeaBattle package.
+ *
+ * (c) Pavel Gushchin <pavel_gushchin@mail.ru>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace SeaBattle\AI;
 
 use SeaBattle\Field\Field;
 use SeaBattle\Field\Slot;
 
-
+/**
+ * SmartShootingAI represents algorithm which
+ * shoots smartly (intermediate level)
+ *
+ * @author Pavel Gushchin <pavel_gushchin@mail.ru>
+ */
 class SmartShootingAI implements ShootingAIInterface
 {
     const SHOOT_HORIZONTALLY = 0;
@@ -23,10 +37,14 @@ class SmartShootingAI implements ShootingAIInterface
         $this->randomShooter = new RandomShootingAI();
     }
 
+    public function __toString()
+    {
+        return 'Smart algorithm';
+    }
 
     public function calculateCoordsForShooting($slots, $ships = null)
     {
-        if ( empty($this->partsOfdamagedShip) ) {
+        if (empty($this->partsOfdamagedShip)) {
             $coords = $this->randomShooter->calculateCoordsForShooting($slots);
         } else {
             $this->variantsForNextShot = [];
@@ -53,10 +71,10 @@ class SmartShootingAI implements ShootingAIInterface
             } else {
                 $this->partsOfdamagedShip[] = [
                     'x' =>  $x,
-                    'y' => $y
+                    'y' => $y,
                 ];
 
-                if ( count($this->partsOfdamagedShip) === 2 ) {
+                if (count($this->partsOfdamagedShip) === 2) {
                     $this->defineShootingDirection();
                 }
             }
@@ -110,7 +128,7 @@ class SmartShootingAI implements ShootingAIInterface
                 $leftSlotState === Slot::THERE_IS_A_SHIP) {
                 $this->variantsForNextShot[] = [
                     'x' => $leftSlotX,
-                    'y' => $leftSlotY
+                    'y' => $leftSlotY,
                 ];
             }
         }
@@ -125,7 +143,7 @@ class SmartShootingAI implements ShootingAIInterface
                 $rightSlotState === Slot::THERE_IS_A_SHIP) {
                 $this->variantsForNextShot[] = [
                     'x' => $rightSlotX,
-                    'y' => $rightSlotY
+                    'y' => $rightSlotY,
                 ];
             }
         }
@@ -144,7 +162,7 @@ class SmartShootingAI implements ShootingAIInterface
                 $topSlotState === Slot::THERE_IS_A_SHIP) {
                 $this->variantsForNextShot[] = [
                     'x' => $topSlotX,
-                    'y' => $topSlotY
+                    'y' => $topSlotY,
                 ];
             }
         }
@@ -159,15 +177,9 @@ class SmartShootingAI implements ShootingAIInterface
                 $bottomSlotState === Slot::THERE_IS_A_SHIP) {
                 $this->variantsForNextShot[] = [
                     'x' => $bottomSlotX,
-                    'y' => $bottomSlotY
+                    'y' => $bottomSlotY,
                 ];
             }
         }
     }
-
-    public function __toString()
-    {
-        return 'Smart algorithm';
-    }
-
 }

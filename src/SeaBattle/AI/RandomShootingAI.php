@@ -1,10 +1,25 @@
 <?php
 
+/*
+ * This file is part of the SeaBattle package.
+ *
+ * (c) Pavel Gushchin <pavel_gushchin@mail.ru>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace SeaBattle\AI;
 
 use SeaBattle\Field\Slot;
 use SeaBattle\Field\Field;
 
+/**
+ * RandomShootingAI represents algorithm which
+ * shoots randomly (easy level)
+ *
+ * @author Pavel Gushchin <pavel_gushchin@mail.ru>
+ */
 class RandomShootingAI implements ShootingAIInterface
 {
     public function calculateCoordsForShooting($slots, $ships = null)
@@ -18,7 +33,7 @@ class RandomShootingAI implements ShootingAIInterface
 
         return [
             'x' => $x,
-            'y' => $y
+            'y' => $y,
         ];
     }
 
