@@ -1,3 +1,5 @@
+'use strict';
+
 $(function() {
     $('#enemyField td').click(function() {
         var uncovered = $(this).hasClass('uncovered');
