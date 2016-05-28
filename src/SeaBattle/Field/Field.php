@@ -76,7 +76,7 @@ class Field
     /**
      * Field constructor.
      *
-     * @param ShootingAIInterface|null $shootingAI
+     * @param ShootingAIInterface|null $shootingAI Represents AI for CPU
      */
     public function __construct(ShootingAIInterface $shootingAI = null)
     {
