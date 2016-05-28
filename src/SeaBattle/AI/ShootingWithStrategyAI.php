@@ -40,7 +40,9 @@ class ShootingWithStrategyAI implements IShootingAI
         $x = $coords['x'];
         $y = $coords['y'];
 
-        $slotState = $slots[$x][$y]->getState();
+        $slotState = !is_null($slots[$x][$y])
+            ? $slots[$x][$y]->getState()
+            : false;
 
         if ($slotState === Slot::THERE_IS_A_SHIP) {
             $shipId = $slots[$x][$y]->getShipId();
@@ -54,10 +56,10 @@ class ShootingWithStrategyAI implements IShootingAI
             } else {
                 $this->partsOfdamagedShip[] = [
                     'x' =>  $x,
-                    'y' => $y
+                    'y' => $y,
                 ];
 
-                if ( count($this->partsOfdamagedShip) === 2 ) {
+                if (count($this->partsOfdamagedShip) === 2) {
                     $this->defineShootingDirection();
                 }
             }
