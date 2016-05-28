@@ -37,7 +37,6 @@ class Game
      */
     const ENEMY_IS_WINNER = 2;
 
-
     /**
      * @var int Constant which indicates that next turn is player's
      */
@@ -47,7 +46,6 @@ class Game
      * @var int Constant which indicates that next turn is CPU's
      */
     const ENEMY_TURN = 1;
-
 
     /**
      * @var Field This variable contains player's Battle Field
