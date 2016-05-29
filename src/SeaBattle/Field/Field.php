@@ -22,14 +22,7 @@ use SeaBattle\AI\ShootingAIInterface;
  */
 class Field
 {
-    /**
-     * @var int Field's width
-     */
     const WIDTH = 10;
-
-    /**
-     * @var int Field's height
-     */
     const HEIGT = 10;
 
     /**

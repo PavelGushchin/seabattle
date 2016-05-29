@@ -18,14 +18,7 @@ namespace SeaBattle\Ship;
  */
 class Ship
 {
-    /**
-     * @var int Represents horizontal positioning of the ship
-     */
     const HORIZONTAL = 0;
-
-    /**
-     * @var int Represents vertical position of the ship
-     */
     const VERTICAL = 1;
 
     /**
@@ -49,7 +42,9 @@ class Ship
     protected $hits = 0;
 
     /**
-     * @var int Direction of the ship (horizontal or vertical)
+     * @var int Direction of the ship (one of
+     *          Ship::HORIZONTAL or
+     *          Ship::VERTICAL)
      */
     protected $direction;
 
