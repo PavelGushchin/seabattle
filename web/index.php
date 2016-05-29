@@ -4,7 +4,6 @@ require "../vendor/autoload.php";
 
 use SeaBattle\Game\Game;
 
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -105,7 +104,7 @@ $_SESSION['game'] = serialize($game);
 
         <?php
         if ($game->isGameover()) {
-            switch($game->getWinner()) {
+            switch ($game->getWinner()) {
                 case Game::I_AM_WINNER:
                     echo '<h1 id="victory">You are the winner!</h1>';
                     break;
@@ -125,7 +124,7 @@ $_SESSION['game'] = serialize($game);
     </div>
 
 
-    <script   src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
     <script src="js/scripts.js"></script>
 </body>
 </html>
