@@ -22,29 +22,11 @@ use SeaBattle\AI\ShootingWithStrategyAI;
  */
 class Game
 {
-    /**
-     * @var int Constant which indicates that game is still running
-     */
     const NO_WINNER = 0;
-
-    /**
-     * @var int Constant which indicates that player is the winner of the game
-     */
     const I_AM_WINNER = 1;
-
-    /**
-     * @var int Constant which indicates that CPU is the winner of the game
-     */
     const ENEMY_IS_WINNER = 2;
 
-    /**
-     * @var int Constant which indicates that next turn is player's
-     */
     const MY_TURN = 0;
-
-    /**
-     * @var int Constant which indicates that next turn is CPU's
-     */
     const ENEMY_TURN = 1;
 
     /**
@@ -63,12 +45,17 @@ class Game
     private $gameover = false;
 
     /**
-     * @var int Shows who is the winner of the game
+     * @var int Shows who is the winner of the game (one of
+     *          Game::NO_WINNER or
+     *          Game::I_AM_WINNER or
+     *          Game::ENEMY_IS_WINNER)
      */
     private $winner = self::NO_WINNER;
 
     /**
-     * @var int Shows whom the next turn is
+     * @var int Shows whom the next turn is (one of
+     *          Game::MY_TURN or
+     *          Game::ENEMY_TURN)
      */
     private $turn = self::MY_TURN;
 
