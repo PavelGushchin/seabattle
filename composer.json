@@ -1,4 +1,15 @@
 {
+  "name": "seabattle",
+  "description": "Sea Battle is a popular guessing game for one player against CPU",
+  "keywords": ["Sea Battle", "Battleship", "Battleships"],
+  "homepage": "https://bitbucket.org/pavel-gushchin/seabattle",
+  "license": "MIT License",
+  "authors": [
+    {
+      "name": "Pavel Gushchin",
+      "email": "pavel_gushchin@mail.ru"
+    }
+  ],
   "autoload": {
     "psr-4": {"": "src"}
   }
