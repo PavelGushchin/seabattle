@@ -22,6 +22,21 @@ use SeaBattle\Field\Field;
  */
 class RandomShootingAI implements ShootingAIInterface
 {
+    /**
+     * Main method of the class.
+     *
+     * It calculates coordinates for next shot
+     * and returns them as array:
+     *  [
+     *      'x' => $x,
+     *      'y' => $y,
+     *  ]
+     *
+     * @param array      $slots Array with slots
+     * @param array|null $ships Array with ships
+     *
+     * @return array Array of shot coordinates
+     */
     public function calculateCoordsForShooting($slots, $ships = null)
     {
         do {
@@ -37,6 +52,11 @@ class RandomShootingAI implements ShootingAIInterface
         ];
     }
 
+    /**
+     * Returns name of the algorithm
+     *
+     * @return string
+     */
     public function __toString()
     {
         return 'Random algorithm';
