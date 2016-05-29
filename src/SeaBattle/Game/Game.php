@@ -26,8 +26,8 @@ class Game
     const I_AM_WINNER = 1;
     const ENEMY_IS_WINNER = 2;
 
-    const MY_TURN = 0;
-    const ENEMY_TURN = 1;
+    const MY_TURN = 3;
+    const ENEMY_TURN = 4;
 
     /**
      * @var Field This variable contains player's Battle Field
@@ -42,7 +42,7 @@ class Game
     /**
      * @var bool Is game over?
      */
-    private $gameover = false;
+    private $gameover = true;
 
     /**
      * @var int Shows who is the winner of the game (one of
