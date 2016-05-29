@@ -27,11 +27,6 @@ class ShootingWithStrategyAI implements ShootingAIInterface
     const SHOOT_BIDIRECTIONALLY = 2;
 
     /**
-     * If it is empty then no ship was hit by previous shot.
-     * If it has any values therefore some ship was hit by
-     * previous shot. In that case we have to shoot to that
-     * ship until we kill it.
-     *
      * @var array Array with coordinates of damaged ship's parts
      */
     private $partsOfdamagedShip = [];
@@ -204,7 +199,7 @@ class ShootingWithStrategyAI implements ShootingAIInterface
     /**
      * It adds all possible variants for shooting in horizontal direction
      *
-     * @param array $slots Array with slots
+     * @param array $slots    Array with slots
      * @param array $shipPart Array with coordinates of ship's part
      */
     private function addNewVariantsForHorizontalShooting($slots, $shipPart)
@@ -245,7 +240,7 @@ class ShootingWithStrategyAI implements ShootingAIInterface
     /**
      * It adds all possible variants for shooting in vertical direction
      *
-     * @param array $slots Array with slots
+     * @param array $slots    Array with slots
      * @param array $shipPart Array with coordinates of ship's part
      */
     private function addNewVariantsForVerticalShooting($slots, $shipPart)

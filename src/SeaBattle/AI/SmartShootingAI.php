@@ -26,22 +26,64 @@ class SmartShootingAI implements ShootingAIInterface
     const SHOOT_VERTICALLY = 1;
     const SHOOT_BIDIRECTIONALLY = 2;
 
+    /**
+     * @var array Array with coordinates of damaged ship's parts
+     */
     private $partsOfdamagedShip = [];
+
+    /**
+     * @var array Array with coordinates of all possible variants
+     *            for next shot
+     */
     private $variantsForNextShot = [];
+
+    /**
+     * @var int Current shooting direction (one of
+     *          ShootingWithStrategyAI::SHOOT_BIDIRECTIONALLY or
+     *          ShootingWithStrategyAI::SHOOT_HORIZONTALLY or
+     *          ShootingWithStrategyAI::SHOOT_BIDIRECTIONALLY)
+     */
     private $shootingDirection = self::SHOOT_BIDIRECTIONALLY;
+
+    /**
+     * @var RandomShootingAI Contains instance of random shooting algorithm
+     */
     private $randomShooter;
 
 
+    /**
+     * SmartShootingAI constructor.
+     */
     public function __construct()
     {
         $this->randomShooter = new RandomShootingAI();
     }
 
+    /**
+     * Returns name of the algorithm
+     *
+     * @return string
+     */
     public function __toString()
     {
         return 'Smart algorithm';
     }
 
+    /**
+     * Main method of the class.
+     *
+     * It calculates coordinates for next shot
+     * and returns them as array:
+     *  [
+     *      'x' => $x,
+     *      'y' => $y,
+     *  ]
+     *
+     * @param array      $slots Array with slots
+     * @param array|null $ships Array with ships
+     *
+     * @return array Array of shot coordinates
+     */
     public function calculateCoordsForShooting($slots, $ships = null)
     {
         if (empty($this->partsOfdamagedShip)) {
@@ -83,7 +125,12 @@ class SmartShootingAI implements ShootingAIInterface
         return $coords;
     }
 
-
+    /**
+     * When ship is hit for the first time we do not know what
+     * direction it has. And first of all we have to determine
+     * that direction and shoot only at that direction until
+     * ship will be killed
+     */
     private function defineShootingDirection()
     {
         $firstPart = $this->partsOfdamagedShip[0];
@@ -96,7 +143,14 @@ class SmartShootingAI implements ShootingAIInterface
         }
     }
 
-
+    /**
+     * When we have a wounded ship we have to shoot smartly
+     * until we kill it
+     *
+     * This method calculates all possible variants for shooting
+     *
+     * @param array $slots Array with slots
+     */
     private function calculateAllVariantsForNextShot($slots)
     {
         foreach ($this->partsOfdamagedShip as $shipPart) {
@@ -115,7 +169,12 @@ class SmartShootingAI implements ShootingAIInterface
         }
     }
 
-
+    /**
+     * It adds all possible variants for shooting in horizontal direction
+     *
+     * @param array $slots    Array with slots
+     * @param array $shipPart Array with coordinates of ship's part
+     */
     private function addNewVariantsForHorizontalShooting($slots, $shipPart)
     {
         $leftSlotX = $shipPart['x'] - 1;
@@ -149,7 +208,12 @@ class SmartShootingAI implements ShootingAIInterface
         }
     }
 
-
+    /**
+     * It adds all possible variants for shooting in vertical direction
+     *
+     * @param array $slots    Array with slots
+     * @param array $shipPart Array with coordinates of ship's part
+     */
     private function addNewVariantsForVerticalShooting($slots, $shipPart)
     {
         $topSlotX = $shipPart['x'];
