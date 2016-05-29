@@ -26,17 +26,64 @@ class ShootingWithStrategyAI implements ShootingAIInterface
     const SHOOT_VERTICALLY = 1;
     const SHOOT_BIDIRECTIONALLY = 2;
 
+    /**
+     * If it is empty then no ship was hit by previous shot.
+     * If it has any values therefore some ship was hit by
+     * previous shot. In that case we have to shoot to that
+     * ship until we kill it.
+     *
+     * @var array Array with coordinates of damaged ship's parts
+     */
     private $partsOfdamagedShip = [];
+
+    /**
+     * @var array Array with coordinates of all possible variants
+     *            for next shot
+     */
     private $variantsForNextShot = [];
+
+    /**
+     * @var int Current shooting direction (one of
+     *          ShootingWithStrategyAI::SHOOT_BIDIRECTIONALLY or
+     *          ShootingWithStrategyAI::SHOOT_HORIZONTALLY or
+     *          ShootingWithStrategyAI::SHOOT_BIDIRECTIONALLY)
+     */
     private $shootingDirection = self::SHOOT_BIDIRECTIONALLY;
+
+    /**
+     * Each slot has its own value for shooting.
+     * First of all we are shooting to slots with the highest values
+     *
+     * @var array Array with values for slots
+     */
     private $valuesForSlots;
 
 
+    /**
+     * Returns name of the algorithm
+     *
+     * @return string
+     */
     public function __toString()
     {
         return 'Strategy algorithm';
     }
 
+    /**
+     * Main method of the class.
+     *
+     * It calculates coordinates for next shot
+     * and returns them as array:
+     *  [
+     *      'x' => $x,
+     *      'y' => $y,
+     *  ]
+     *
+     * @param array      $slots Array with slots
+     * @param array|null $ships Array with ships
+     *
+     * @return array Array of shot coordinates
+     */
     public function calculateCoordsForShooting($slots, $ships = null)
     {
         $this->variantsForNextShot = [];
@@ -75,7 +122,7 @@ class ShootingWithStrategyAI implements ShootingAIInterface
                 $this->shootingDirection = self::SHOOT_BIDIRECTIONALLY;
             } else {
                 $this->partsOfdamagedShip[] = [
-                    'x' =>  $x,
+                    'x' => $x,
                     'y' => $y,
                 ];
 
@@ -88,7 +135,12 @@ class ShootingWithStrategyAI implements ShootingAIInterface
         return $coords;
     }
 
-
+    /**
+     * When ship is hit for the first time we do not know what
+     * direction it has. And first of all we have to determine
+     * that direction and shoot only at that direction until
+     * ship will be killed
+     */
     private function defineShootingDirection()
     {
         $firstPart = $this->partsOfdamagedShip[0];
@@ -101,7 +153,12 @@ class ShootingWithStrategyAI implements ShootingAIInterface
         }
     }
 
-
+    /**
+     * When we do not have any wounded ships we pick variant for next
+     * shot randomly
+     *
+     * @param array $slots Array with slots
+     */
     private function calculateAllVariantsForRandomShot($slots)
     {
         for ($i = 0; $i < Field::WIDTH; $i++) {
@@ -120,6 +177,12 @@ class ShootingWithStrategyAI implements ShootingAIInterface
         }
     }
 
+    /**
+     * When we do have a wounded ship we have to shoot smartly
+     * until we kill it
+     *
+     * @param array $slots Array with slots
+     */
     private function calculateAllVariantsForSmartShot($slots)
     {
         foreach ($this->partsOfdamagedShip as $shipPart) {
@@ -138,7 +201,12 @@ class ShootingWithStrategyAI implements ShootingAIInterface
         }
     }
 
-
+    /**
+     * It adds all possible variants for shooting in horizontal direction
+     *
+     * @param array $slots Array with slots
+     * @param array $shipPart Array with coordinates of ship's part
+     */
     private function addNewVariantsForHorizontalShooting($slots, $shipPart)
     {
         $leftSlotX = $shipPart['x'] - 1;
@@ -174,7 +242,12 @@ class ShootingWithStrategyAI implements ShootingAIInterface
         }
     }
 
-
+    /**
+     * It adds all possible variants for shooting in vertical direction
+     *
+     * @param array $slots Array with slots
+     * @param array $shipPart Array with coordinates of ship's part
+     */
     private function addNewVariantsForVerticalShooting($slots, $shipPart)
     {
         $topSlotX = $shipPart['x'];
@@ -210,7 +283,13 @@ class ShootingWithStrategyAI implements ShootingAIInterface
         }
     }
 
-
+    /**
+     * This method evaluates all slots.
+     * The higher slot's value is, the sooner it will be shot
+     *
+     * @param array $slots Array with slots
+     * @param array $ships Array with ships
+     */
     private function setValuesForSlots($slots, $ships)
     {
         $this->valuesForSlots = [];
@@ -264,7 +343,16 @@ class ShootingWithStrategyAI implements ShootingAIInterface
         }
     }
 
-
+    /**
+     * Returns number of uncovered slots to the left
+     * from our checked slot
+     *
+     * @param array $slots Array with slots
+     * @param int   $x     X-coordinate of checked slot
+     * @param int   $y     Y-coordinate of checked slot
+     *
+     * @return int
+     */
     private function getAmountOfLeftUncoveredSlots($slots, $x, $y)
     {
         $amount = 0;
@@ -284,7 +372,16 @@ class ShootingWithStrategyAI implements ShootingAIInterface
         return $amount;
     }
 
-
+    /**
+     * Returns number of uncovered slots to the right
+     * from our checked slot
+     *
+     * @param array $slots Array with slots
+     * @param int   $x     X-coordinate of checked slot
+     * @param int   $y     Y-coordinate of checked slot
+     *
+     * @return int
+     */
     private function getAmountOfRightUncoveredSlots($slots, $x, $y)
     {
         $amount = 0;
@@ -304,7 +401,16 @@ class ShootingWithStrategyAI implements ShootingAIInterface
         return $amount;
     }
 
-
+    /**
+     * Returns number of uncovered slots from above
+     * of our checked slot
+     *
+     * @param array $slots Array with slots
+     * @param int   $x     X-coordinate of checked slot
+     * @param int   $y     Y-coordinate of checked slot
+     *
+     * @return int
+     */
     private function getAmountOfTopUncoveredSlots($slots, $x, $y)
     {
         $amount = 0;
@@ -324,7 +430,16 @@ class ShootingWithStrategyAI implements ShootingAIInterface
         return $amount;
     }
 
-
+    /**
+     * Returns number of uncovered slots from below
+     * of our checked slot
+     *
+     * @param array $slots Array with slots
+     * @param int   $x     X-coordinate of checked slot
+     * @param int   $y     Y-coordinate of checked slot
+     *
+     * @return int
+     */
     private function getAmountOfBottomUncoveredSlots($slots, $x, $y)
     {
         $amount = 0;
