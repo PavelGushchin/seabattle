@@ -18,8 +18,8 @@ namespace SeaBattle\Ship;
  */
 class Ship
 {
-    const HORIZONTAL = 0;
-    const VERTICAL = 1;
+    const HORIZONTAL = 1;
+    const VERTICAL = 2;
 
     /**
      * @var int Identification number of the ship
@@ -92,7 +92,7 @@ class Ship
     {
         $this->hits++;
 
-        if ($this->size === $this->hits) {
+        if ($this->size <= $this->hits) {
             $this->isDead = true;
 
             return true;
@@ -239,6 +239,16 @@ class Ship
     public function getHits()
     {
         return $this->hits;
+    }
+
+    /**
+     * Sets ship's hits
+     *
+     * @param int $hits Number of times the ship was hit
+     */
+    public function setHits($hits = 0)
+    {
+        $this->hits = $hits;
     }
 
     /**
