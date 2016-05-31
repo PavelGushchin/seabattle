@@ -13,6 +13,7 @@ namespace SeaBattle\Game;
 
 use SeaBattle\Field\Field;
 use SeaBattle\AI\ShootingWithStrategyAI;
+use SeaBattle\AI\SmartShootingAI;
 
 /**
  * This class is playing a role of the main controller of the game
@@ -22,12 +23,12 @@ use SeaBattle\AI\ShootingWithStrategyAI;
  */
 class Game
 {
-    const NO_WINNER = 0;
-    const I_AM_WINNER = 1;
-    const ENEMY_IS_WINNER = 2;
+    const NO_WINNER = 1;
+    const I_AM_WINNER = 2;
+    const ENEMY_IS_WINNER = 3;
 
-    const MY_TURN = 3;
-    const ENEMY_TURN = 4;
+    const MY_TURN = 4;
+    const ENEMY_TURN = 5;
 
     /**
      * @var Field This variable contains player's Battle Field
@@ -87,6 +88,27 @@ class Game
         $this->enemyField->placeShipsRandomly();
 
         $this->winner   = self::NO_WINNER;
+        $this->gameover = false;
+    }
+
+    /**
+     * This method creates new blank Battle Fields for 2 CPUs which
+     * will be playing against each other
+     *
+     * Also it randomly places ships on that Battle Fields and assigns
+     * default values to some variables
+     */
+    public function startAutobattleGame()
+    {
+        $this->myField = new Field(new SmartShootingAI());
+        $this->myField->createShips();
+        $this->myField->placeShipsRandomly();
+
+        $this->enemyField = new Field(new ShootingWithStrategyAI());
+        $this->enemyField->createShips();
+        $this->enemyField->placeShipsRandomly();
+
+        $this->winner = self::NO_WINNER;
         $this->gameover = false;
     }
 
