@@ -10,7 +10,7 @@ git clone git@bitbucket.org:pavel-gushchin/seabattle.git
 cd seabattle
 composer update
 cd web
-php localhost -S localhost:8080
+php -S localhost:8080
 ```
 Затем перейти на `http://localhost:8080` в браузере.
 
@@ -48,14 +48,14 @@ public function startNewGame()
 
 Для тестирования эффективности алгоритмов я ввёл фичу автобитвы, то есть возможности "стравливать" алгоритмы друг с другом. Активировать её можно следующим образом:
 
-    http://localhost:8080/?autobattle=100
+    http://localhost:8080/?autobattle=10
 
-где 100 - это количество игр, которое алгоритмы сыграют друг с другом.
+где 10 - это количество игр, которое алгоритмы сыграют друг с другом.
 
 
 ## Запуск тестов
 
+Перейдите в корень проекта и введите:
 ```shell
-cd seabattle
 vendor/bin/phpunit
 ```
