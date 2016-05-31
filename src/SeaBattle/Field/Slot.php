@@ -21,32 +21,32 @@ class Slot
     /**
      * @var int Slot is hidden from player
      */
-    const SLOT_IS_UNCOVERED = 0;
+    const SLOT_IS_UNCOVERED = 1;
 
     /**
      * @var int Slot is empty for sure because beside it is a ship
      */
-    const SLOT_IS_EMPTY = 1;
+    const SLOT_IS_EMPTY = 2;
 
     /**
      * @var int Player shot to slot but it was empty
      */
-    const PLAYER_MISSED = 2;
+    const PLAYER_MISSED = 3;
 
     /**
      * @var int Slot contains a ship
      */
-    const THERE_IS_A_SHIP = 3;
+    const THERE_IS_A_SHIP = 4;
 
     /**
      * @var int Player shot to slot and there was a ship
      */
-    const SHIP_WAS_HIT = 4;
+    const SHIP_WAS_HIT = 5;
 
     /**
      * @var int Slot contains already dead ship
      */
-    const SHIP_IS_DEAD = 5;
+    const SHIP_IS_DEAD = 6;
 
     /**
      * @var int Current state of the slot
