@@ -134,13 +134,13 @@ class Field
      */
     public function handleShot($x, $y)
     {
-        try {
-            $slot = $this->getSlot($x, $y);
-        } catch (\Exception $e) {
+        if ($x < 0 || $x >= self::WIDTH ||
+            $y < 0 || $y >= self::HEIGT) {
             return false;
         }
 
         $shipWasHit = false;
+        $slot = $this->getSlot($x, $y);
 
         switch ($slot->getState()) {
             case Slot::SLOT_IS_UNCOVERED:
@@ -240,7 +240,7 @@ class Field
      */
     public function allShipsAreDead()
     {
-        return ($this->totalAmountOfShips === $this->deadShips)
+        return ($this->totalAmountOfShips <= $this->deadShips)
             ? true
             : false
         ;
@@ -254,19 +254,9 @@ class Field
      * @param int $y
      *
      * @return Slot
-     *
-     * @throws \Exception When parameters are invalid
      */
     public function getSlot($x, $y)
     {
-        if ($x < 0 || $x >= self::WIDTH ||
-            $y < 0 || $y >= self::HEIGT ||
-            filter_var($x, FILTER_VALIDATE_INT) ||
-            filter_var($y, FILTER_VALIDATE_INT)
-        ) {
-            throw new \Exception('Invalid coordinates!');
-        }
-
         return $this->slots[$x][$y];
     }
 
