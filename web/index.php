@@ -29,10 +29,11 @@ if (isset($_GET['startNewGame'])) {
 $myField = $game->getMyField();
 $enemyField = $game->getEnemyField();
 
+
 if (isset($_GET['x']) && isset($_GET['y'])) {
     if (!$game->isGameover() && $game->getTurn() === Game::MY_TURN) {
-        $x = filter_input(INPUT_GET, 'x', FILTER_SANITIZE_NUMBER_INT);
-        $y = filter_input(INPUT_GET, 'y', FILTER_SANITIZE_NUMBER_INT);
+        $x = intval($_GET['x']);
+        $y = intval($_GET['y']);
 
         $shipWasHit = $game->shootingTo($enemyField, $x, $y);
 
@@ -61,6 +62,86 @@ if (isset($_GET['x']) && isset($_GET['y'])) {
             }
         }
     }
+}
+
+
+if (isset($_GET['autobattle'])) {
+
+    set_time_limit(0);
+
+    $numberOfGames = filter_input(INPUT_GET, 'autobattle', FILTER_SANITIZE_NUMBER_INT);
+    $currentGame = 1;
+
+    $firstAlgorithmWins = 0;
+    $secondAlgorithmWins = 0;
+
+    $firstAlgorithmTotalShots = 0;
+    $secondAlgorithmTotalShots = 0;
+
+    while($currentGame <= $numberOfGames) {
+
+        $game = new Game();
+        $game->startAutobattleGame();
+
+        $myField = $game->getMyField();
+        $enemyField = $game->getEnemyField();
+
+        while(!$game->isGameover()) {
+            while (!$game->isGameover() && $game->getTurn() === Game::MY_TURN) {
+                $shootingAI = $myField->getShootingAI();
+                $coords = $shootingAI->calculateCoordsForShooting(
+                    $enemyField->getSlots(),
+                    $enemyField->getShips()
+                );
+
+                $shipWasHit = $game->shootingTo($enemyField, $coords['x'], $coords['y']);
+
+                if ($shipWasHit) {
+                    $game->setTurn(Game::MY_TURN);
+                } else {
+                    $game->passTurnToNextPlayer();
+                }
+            }
+
+            while (!$game->isGameover() && $game->getTurn() === Game::ENEMY_TURN) {
+                $shootingAI = $enemyField->getShootingAI();
+                $coords = $shootingAI->calculateCoordsForShooting(
+                    $myField->getSlots(),
+                    $myField->getShips()
+                );
+
+                $shipWasHit = $game->shootingTo($myField, $coords['x'], $coords['y'], true);
+
+                if ($shipWasHit) {
+                    $game->setTurn(Game::ENEMY_TURN);
+                } else {
+                    $game->passTurnToNextPlayer();
+                }
+            }
+        }
+
+
+        switch($game->getWinner()) {
+            case Game::I_AM_WINNER:
+                $firstAlgorithmWins++;
+                break;
+            case Game::ENEMY_IS_WINNER:
+                $secondAlgorithmWins++;
+                break;
+        }
+
+        $firstAlgorithmTotalShots += $enemyField->getTotalShots();
+        $secondAlgorithmTotalShots += $myField->getTotalShots();
+
+        $currentGame++;
+    }
+
+    $firstAlgorithmAverageShotsToWin = $firstAlgorithmTotalShots / $numberOfGames;
+    $secondAlgorithmAverageShotsToWin = $secondAlgorithmTotalShots / $numberOfGames;
+
+    echo "{$myField->getShootingAI()}: wins - $firstAlgorithmWins<br>";
+
+    echo "{$enemyField->getShootingAI()}: wins - $secondAlgorithmWins<br>";
 }
 
 
@@ -124,7 +205,7 @@ $_SESSION['game'] = serialize($game);
     </div>
 
 
-    <script src="https://code.jquery.com/jquery-2.2.3.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo=" crossorigin="anonymous"></script>
+    <script src="js/jquery-2.2.3.min.js"></script>
     <script src="js/scripts.js"></script>
 </body>
 </html>
