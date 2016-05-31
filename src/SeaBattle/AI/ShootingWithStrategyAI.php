@@ -22,9 +22,9 @@ use SeaBattle\Field\Slot;
  */
 class ShootingWithStrategyAI implements ShootingAIInterface
 {
-    const SHOOT_HORIZONTALLY = 0;
-    const SHOOT_VERTICALLY = 1;
-    const SHOOT_BIDIRECTIONALLY = 2;
+    const SHOOT_HORIZONTALLY = 1;
+    const SHOOT_VERTICALLY = 2;
+    const SHOOT_BIDIRECTIONALLY = 3;
 
     /**
      * @var array Array with coordinates of damaged ship's parts
