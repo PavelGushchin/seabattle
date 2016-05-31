@@ -11,6 +11,8 @@
 
 namespace SeaBattle\Game;
 
+use SeaBattle\Field\Field;
+
 class GameTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -105,10 +107,9 @@ class GameTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [-1, -2],
-            [15, 25],
-            ["a", 5],
-            [6, "a"],
-            ["a", "b"],
+            [Field::WIDTH + 1, Field::HEIGT + 1],
+            [-1, Field::HEIGT + 1],
+            [Field::WIDTH + 1, -2],
         ];
     }
 
