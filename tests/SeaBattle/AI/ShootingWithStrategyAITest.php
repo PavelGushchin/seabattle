@@ -39,4 +39,15 @@ class ShootingWithStrategyAITest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($x >= 0 && $x < Field::WIDTH);
         $this->assertTrue($y >= 0 && $y < Field::HEIGT);
     }
+
+    /**
+     * @covers \SeaBattle\AI\ShootingWithStrategyAI::__toString
+     */
+    public function testReturnsStringWhenToStringMethodIsCalled()
+    {
+        $shootingAI = new ShootingWithStrategyAI();
+        $algorithmName = $shootingAI->__toString();
+
+        $this->assertTrue(is_string($algorithmName));
+    }
 }
