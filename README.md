@@ -10,7 +10,7 @@ I wrote this project in 2016 on PHP 5.6
 ## Установка и запуск
 
 ```shell
-git clone https://github.com/PavelGushchin/seabattle
+https://github.com/PavelGushchin/seabattle.git
 cd seabattle
 composer update
 cd public
