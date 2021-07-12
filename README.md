@@ -1,5 +1,7 @@
 # Морской бой
 
+## History
+I wrote this project in 2016 on PHP 5.6
 
 ## Описание
 Это проект, который я затеял, чтобы получше разобраться в тонкостях ООП, попытавшись построить архитектуру игры полностью в объектно-ориентированном стиле. Я, конечно, понимаю, что подобные игры лучше писать на Javascript'е, но я решил, что в учебных целях данный проект окажется весьма полезным.
@@ -8,10 +10,10 @@
 ## Установка и запуск
 
 ```shell
-git clone git@bitbucket.org:pavel-gushchin/seabattle.git
+git clone https://github.com/PavelGushchin/seabattle
 cd seabattle
 composer update
-cd web
+cd public
 php -S localhost:8080
 ```
 Затем перейти на `http://localhost:8080` в браузере.
