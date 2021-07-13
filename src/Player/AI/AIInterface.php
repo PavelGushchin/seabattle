@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace SeaBattle\AI;
+namespace SeaBattle\Player\AI;
 
 /**
  * ShootingAIInterface is supposed to represent 'brains' of CPU.
@@ -19,7 +19,7 @@ namespace SeaBattle\AI;
  *
  * @author Pavel Gushchin <pavel_gushchin@mail.ru>
  */
-interface ShootingAIInterface
+interface AIInterface
 {
     /**
      * The main goal of this method is to return an array

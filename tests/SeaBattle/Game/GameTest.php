@@ -154,11 +154,11 @@ class GameTest extends \PHPUnit_Framework_TestCase
     {
         $game = new Game();
 
-        $game->setWinner(Game::I_AM_WINNER);
-        $this->assertSame(Game::I_AM_WINNER, $game->getWinner());
+        $game->setWinner(Game::I_AM_THE_WINNER);
+        $this->assertSame(Game::I_AM_THE_WINNER, $game->getWinner());
 
-        $game->setWinner(Game::ENEMY_IS_WINNER);
-        $this->assertSame(Game::ENEMY_IS_WINNER, $game->getWinner());
+        $game->setWinner(Game::ENEMY_IS_THE_WINNER);
+        $this->assertSame(Game::ENEMY_IS_THE_WINNER, $game->getWinner());
 
         $game->setWinner(Game::NO_WINNER);
         $this->assertSame(Game::NO_WINNER, $game->getWinner());

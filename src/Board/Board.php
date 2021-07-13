@@ -1,18 +1,9 @@
 <?php
 
-/*
- * This file is part of the SeaBattle package.
- *
- * (c) Pavel Gushchin <pavel_gushchin@mail.ru>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+namespace SeaBattle\Board;
 
-namespace SeaBattle\Field;
-
-use SeaBattle\Ship\Ship;
-use SeaBattle\AI\ShootingAIInterface;
+use SeaBattle\Ship;
+use SeaBattle\AI\AIInterface;
 
 /**
  * Field represents battle field on which player can locate ships.
@@ -20,7 +11,7 @@ use SeaBattle\AI\ShootingAIInterface;
  *
  * @author Pavel Gushchin <pavel_gushchin@mail.ru>
  */
-class Field
+class Board
 {
     const WIDTH = 10;
     const HEIGT = 10;
@@ -69,9 +60,9 @@ class Field
     /**
      * Field constructor.
      *
-     * @param ShootingAIInterface|null $shootingAI Represents AI for CPU
+     * @param AIInterface|null $shootingAI Represents AI for CPU
      */
-    public function __construct(ShootingAIInterface $shootingAI = null)
+    public function __construct(AIInterface $shootingAI = null)
     {
         $this->shootingAI = $shootingAI;
 
@@ -96,6 +87,8 @@ class Field
                 $this->totalAmountOfShips++;
             }
         }
+
+        $this->placeShipsRandomly();
     }
 
     /**

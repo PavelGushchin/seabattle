@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace SeaBattle\Ship;
+namespace SeaBattle\Board;
 
 /**
  * This class contains all properties and methods related to ships.

@@ -16,6 +16,6 @@
     "phpunit/phpunit": "^9.5"
   },
   "autoload": {
-    "psr-4": { "": "src/" }
+    "psr-4": { "SeaBattle\\": "src/" }
   }
 }

@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace SeaBattle\Field;
+namespace SeaBattle\Board;
 
 /**
  * Slot represents a cell of a battle field.
  *
  * @author Pavel Gushchin <pavel_gushchin@mail.ru>
  */
-class Slot
+class Cell
 {
     /**
      * @var int Slot is hidden from player

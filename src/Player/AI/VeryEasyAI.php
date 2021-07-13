@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace SeaBattle\AI;
+namespace SeaBattle\Player\AI;
 
 use SeaBattle\Field\Slot;
 use SeaBattle\Field\Field;
@@ -20,7 +20,7 @@ use SeaBattle\Field\Field;
  *
  * @author Pavel Gushchin <pavel_gushchin@mail.ru>
  */
-class RandomShootingAI implements ShootingAIInterface
+class VeryEasyAI implements AIInterface
 {
     /**
      * Main method of the class.

@@ -19,12 +19,12 @@ th, td {
     height: 30px;
 }
 
-#myFieldContainer, #enemyFieldContainer {
+#myBoardContainer, #enemyBoardContainer {
     display: inline-block;
     margin: 0 15px;
 }
 
-#enemyField td.uncovered {
+#enemyBoard td.uncovered {
     cursor: pointer;
 }
 
@@ -37,7 +37,7 @@ th, td {
     margin-left: 50px;
 }
 
-#startGame {
+#new-game__button {
     background-color: #FF9200;
     width: 120px;
     height: 40px;

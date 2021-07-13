@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace SeaBattle\AI;
+namespace SeaBattle\Player\AI;
 
-use SeaBattle\Field\Field;
-use SeaBattle\Field\Slot;
+use SeaBattle\Board;
+use SeaBattle\Cell;
 
 /**
  * ShootingWithStrategyAI represents algorithm which shoots
@@ -20,7 +20,7 @@ use SeaBattle\Field\Slot;
  *
  * @author Pavel Gushchin <pavel_gushchin@mail.ru>
  */
-class ShootingWithStrategyAI implements ShootingAIInterface
+class NormalAI implements AIInterface
 {
     const SHOOT_HORIZONTALLY = 1;
     const SHOOT_VERTICALLY = 2;
