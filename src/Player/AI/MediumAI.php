@@ -20,7 +20,7 @@ use SeaBattle\Cell;
  *
  * @author Pavel Gushchin <pavel_gushchin@mail.ru>
  */
-class NormalAI implements AIInterface
+class MediumAI implements AIInterface
 {
     const SHOOT_HORIZONTALLY = 1;
     const SHOOT_VERTICALLY = 2;

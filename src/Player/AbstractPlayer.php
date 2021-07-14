@@ -3,39 +3,36 @@
 
 namespace SeaBattle\Player;
 
+use SeaBattle\Board\AbstractBoard;
+use SeaBattle\Board\EnemyBoard;
+use SeaBattle\Board\MyBoard;
+
 
 abstract class AbstractPlayer
 {
-    public function getBoard()
-    {
+    protected MyBoard $myBoard;
+    protected EnemyBoard $enemyBoard;
 
+
+    abstract public function getCoordsForShooting(): array;
+    abstract public function answerIfShipWasHit(int $x, int $y): bool;
+    abstract public function writeResultOfShooting(int $x, int $y, bool $wasShipHit);
+
+
+    public function isLost(): bool
+    {
+        return $this->myBoard->getNumOfAliveShips() === 0;
     }
 
 
-    /**
-     * This method is used for shooting to opponent
-     *
-     * @param  Board $attackedBoard Indicates which Battle Board is under the fire
-     * @param  int   $x             Represents horizontal shooting coordinate
-     * @param  int   $y             Represents vertical shooting coordinate
-     * @param  bool  $isEnemy       It is 'true' if CPU is shooting
-     *
-     * @return bool Indicates if our shot was successful or not
-     */
-    public function shootingTo(Board $attackedBoard, $x, $y, $isEnemy = false)
+    public function getMyBoard(): MyBoard
     {
-        $shipWasHit = $attackedBoard->handleShot($x, $y);
+        return $this->myBoard;
+    }
 
-        if ($attackedBoard->allShipsAreDead()) {
-            $this->setGameover(true);
 
-            if ($isEnemy === false) {
-                $this->setWinner(Game::I_AM_THE_WINNER);
-            } else {
-                $this->setWinner(Game::ENEMY_IS_THE_WINNER);
-            }
-        }
-
-        return $shipWasHit;
+    public function getEnemyBoard(): EnemyBoard
+    {
+        return $this->enemyBoard;
     }
 }

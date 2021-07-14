@@ -3,7 +3,7 @@
 namespace SeaBattle;
 
 use SeaBattle\Player\AbstractPlayer;
-use SeaBattle\Player\AI\NormalAI;
+use SeaBattle\Player\AI\MediumAI;
 use SeaBattle\Player\AI\EasyAI;
 use SeaBattle\Player\EnemyPlayer;
 use SeaBattle\Player\MyPlayer;
@@ -19,11 +19,14 @@ class Game
     const I_AM_THE_WINNER = "I am the winner";
     const ENEMY_IS_THE_WINNER = "Enemy is the winner";
 
+    const MY_TURN = "My turn";
+    const ENEMY_TURN = "Enemy's turn";
+
     private AbstractPlayer $myPlayer;
     private AbstractPlayer $enemyPlayer;
 
-    private string $theWinner = Game::NO_WINNER;
-    private bool $isMyTurn = true;
+    private string $theWinner = self::NO_WINNER;
+    private string $turn = self::MY_TURN;
 
 
     public function __construct()
@@ -38,11 +41,11 @@ class Game
         $this->myPlayer = new MyPlayer();
         $this->myPlayer->placeShipsOnBoard();
 
-        $this->enemyPlayer = new enemyPlayer(new NormalAI());
+        $this->enemyPlayer = new enemyPlayer(new MediumAI());
         $this->enemyPlayer->placeShipsOnBoard();
 
-        $this->theWinner = Game::NO_WINNER;
-        $this->isMyTurn = true;
+        $this->theWinner = self::NO_WINNER;
+        $this->turn = self::MY_TURN;
     }
 
 
@@ -52,31 +55,29 @@ class Game
             return;
         }
 
-        $myPlayer = $this->myPlayer;
-        $enemyPlayer = $this->enemyPlayer;
+        /** My shooting **/
+        [$x, $y] = $this->myPlayer->getCoordsForShooting();
+        $wasShipHit = $this->enemyPlayer->answerIfShipWasHit($x, $y);
+        $this->myPlayer->writeResultOfShooting($x, $y, $wasShipHit);
 
-        if (isset($_GET['x']) && isset($_GET['y'])) {
-            $x = intval($_GET['x']);
-            $y = intval($_GET['y']);
+        $this->turn = $wasShipHit ? self::MY_TURN : self::ENEMY_TURN;
 
-            $wasShipHit = $myPlayer->shootTo($enemyPlayer->getBoard(), $x, $y);
+        if ($this->enemyPlayer->isLost()) {
+            $this->theWinner = self::I_AM_THE_WINNER;
+            return;
+        }
 
-            $this->isMyTurn = $wasShipHit;
+        /** Enemy's shooting **/
+        while ($this->turn === self::ENEMY_TURN) {
+            [$x, $y] = $this->enemyPlayer->getCoordsForShooting();
+            $wasShipHit = $this->myPlayer->answerIfShipWasHit($x, $y);
+            $this->enemyPlayer->writeResultOfShooting($x, $y, $wasShipHit);
 
-            if ($enemyPlayer->isLost()) {
-                $this->theWinner = Game::I_AM_THE_WINNER;
+            $this->turn = $wasShipHit ? self::ENEMY_TURN : self::MY_TURN;
+
+            if ($this->myPlayer->isLost()) {
+                $this->theWinner = self::ENEMY_IS_THE_WINNER;
                 return;
-            }
-
-            while ($this->isMyTurn === false) {
-                $wasShipHit = $enemyPlayer->shootTo($myPlayer->getBoard());
-
-                $this->isMyTurn = !$wasShipHit;
-
-                if ($myPlayer->isLost()) {
-                    $this->theWinner = Game::ENEMY_IS_THE_WINNER;
-                    return;
-                }
             }
         }
     }
@@ -87,11 +88,11 @@ class Game
         $this->myPlayer = new MyPlayer(new EasyAI());
         $this->myPlayer->placeShipsOnBoard();
 
-        $this->enemyPlayer = new enemyPlayer(new NormalAI());
+        $this->enemyPlayer = new enemyPlayer(new MediumAI());
         $this->enemyPlayer->placeShipsOnBoard();
 
-        $this->theWinner = Game::NO_WINNER;
-        $this->isMyTurn = true;
+        $this->theWinner = self::NO_WINNER;
+        $this->turn = self::MY_TURN;
     }
 
 
@@ -108,7 +109,7 @@ class Game
 
     public function gameIsOver(): bool
     {
-        return $this->theWinner !== Game::NO_WINNER;
+        return $this->theWinner !== self::NO_WINNER;
     }
 
 
