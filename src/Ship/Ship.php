@@ -1,57 +1,29 @@
 <?php
 
-/*
- * This file is part of the SeaBattle package.
- *
- * (c) Pavel Gushchin <pavel_gushchin@mail.ru>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+namespace SeaBattle\Ship;
 
-namespace SeaBattle\Board;
 
-/**
- * This class contains all properties and methods related to ships.
- *
- * @author Pavel Gushchin <pavel_gushchin@mail.ru>
- */
 class Ship
 {
-    const HORIZONTAL = 1;
-    const VERTICAL = 2;
+    const HORIZONTAL = "Ship has horizontal direction";
+    const VERTICAL = "Ship has vertical direction";
+
+    protected int $id;
+    protected bool $isDead = false;
+    protected int $size;
+    protected int $hits = 0;
 
     /**
-     * @var int Identification number of the ship
-     */
-    protected $id;
-
-    /**
-     * @var bool Is ship dead?
-     */
-    protected $isDead;
-
-    /**
-     * @var int Ship's size
-     */
-    protected $size;
-
-    /**
-     * @var int Number of times the ship was hit
-     */
-    protected $hits = 0;
-
-    /**
-     * @var int Direction of the ship (one of
+     * @var string Direction of the ship (one of
      *          Ship::HORIZONTAL or
      *          Ship::VERTICAL)
      */
-    protected $direction;
+    protected string $direction;
 
     /**
      * @var int X-coordinate of the ship's head
      */
-    protected $startX;
+    protected int $startX;
 
     /**
      * @var int Y-coordinate of the ship's head
@@ -69,12 +41,6 @@ class Ship
     protected $endY;
 
 
-    /**
-     * Ship constructor.
-     *
-     * @param int $id   Ship's id
-     * @param int $size Ship's size
-     */
     public function __construct($id, $size)
     {
         $this->id = $id;

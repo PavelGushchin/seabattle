@@ -1,18 +1,10 @@
 <?php
 
-/*
- * This file is part of the SeaBattle package.
- *
- * (c) Pavel Gushchin <pavel_gushchin@mail.ru>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace SeaBattle\Player\AI;
 
 use SeaBattle\Field\Slot;
 use SeaBattle\Field\Field;
+
 
 /**
  * RandomShootingAI represents algorithm which

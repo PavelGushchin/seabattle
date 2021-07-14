@@ -40,20 +40,20 @@ $_SESSION['game'] = serialize($game);
         <div id="container">
             <h1>Sea Battle</h1>
     
-            <div id="myBoardContainer">
+            <div id="mainBoardContainer">
                 <h2>My ships</h2>
     
-                <table id="myBoard">
-                    <?php $game->getMyPlayer()->printBoard(); ?>
-                </table>
+                <div id="mainBoard">
+                    <?php $game->getMyPlayer()->printMainBoard(); ?>
+                </div>
             </div>
     
-            <div id="enemyBoardContainer">
+            <div id="shootingBoardContainer">
                 <h2>Enemy's ships</h2>
     
-                <table id="enemyBoard">
-                    <?php $game->getEnemyPlayer()->printBoard(); ?>
-                </table>
+                <div id="shootingBoard">
+                    <?php $game->getMyPlayer()->printShootingBoard(); ?>
+                </div>
             </div>
 
             <?php

@@ -19,12 +19,12 @@ th, td {
     height: 30px;
 }
 
-#myBoardContainer, #enemyBoardContainer {
+#mainBoardContainer, #shootingBoardContainer {
     display: inline-block;
     margin: 0 15px;
 }
 
-#enemyBoard td.uncovered {
+#shootingBoard td.covered {
     cursor: pointer;
 }
 

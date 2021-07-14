@@ -2,229 +2,29 @@
 
 namespace SeaBattle\Board;
 
-use SeaBattle\Ship;
-use SeaBattle\AI\AIInterface;
+use SeaBattle\Ship\Ship;
+use SeaBattle\Board\Cell;
 
-/**
- * Field represents battle field on which player can locate ships.
- * Also Field can handle shots from opponent.
- *
- * @author Pavel Gushchin <pavel_gushchin@mail.ru>
- */
+
 class Board
 {
     const WIDTH = 10;
-    const HEIGT = 10;
+    const HEIGHT = 10;
 
-    /**
-     * @var array Array of slots from which consists Field
-     */
-    protected $slots = [];
+    protected array $cells;
 
-    /**
-     * @var array Array of ships which are placed on the Field
-     */
-    protected $ships = [];
+//    protected int $numOfShipsOnBoard = 0;
 
-    /**
-     * @var ShootingAIInterface Contains AI for CPU
-     */
-    protected $shootingAI;
-
-    /**
-     * @var int Total number of ships placed on the Field
-     */
-    protected $totalAmountOfShips = 0;
-
-    /**
-     * @var int Number of ships killed by opponent
-     */
-    protected $deadShips = 0;
-
-    /**
-     * @var int Total number of shots made by opponent
-     */
-    protected $totalShots = 0;
-
-    /**
-     * @var array Configuration for ship creation
-     */
-    protected $shipsToBeCreated = [
-        ['size' => 4, 'amount' => 1],
-        ['size' => 3, 'amount' => 2],
-        ['size' => 2, 'amount' => 3],
-        ['size' => 1, 'amount' => 4],
-    ];
-
-
-    /**
-     * Field constructor.
-     *
-     * @param AIInterface|null $shootingAI Represents AI for CPU
-     */
-    public function __construct(AIInterface $shootingAI = null)
+    public function __construct()
     {
-        $this->shootingAI = $shootingAI;
-
         for ($x = 0; $x < self::WIDTH; $x++) {
-            for ($y = 0; $y < self::HEIGT; $y++) {
-                $this->slots[$x][$y] = new Slot();
+            for ($y = 0; $y < self::HEIGHT; $y++) {
+                $this->cells[$x][$y] = new Cell();
             }
         }
     }
 
-    /**
-     * This method is used to create ships.
-     *
-     * @see Field::$shipsToBeCreated
-     */
-    public function createShips()
-    {
-        foreach ($this->shipsToBeCreated as $shipsInfo) {
-            for ($i = 0; $i < $shipsInfo['amount']; $i++) {
-                $shipId = $this->totalAmountOfShips;
-                $this->ships[$shipId] = new Ship($shipId, $shipsInfo['size']);
-                $this->totalAmountOfShips++;
-            }
-        }
 
-        $this->placeShipsRandomly();
-    }
-
-    /**
-     * This method chooses random locations for all ships.
-     *
-     * First, it choose random x and y coordinate for ship's head.
-     * Second, it checks if ship can be located there: if can -
-     * it places the ship on Field, but if can not - it chooses
-     * another x and y coordinates.
-     */
-    public function placeShipsRandomly()
-    {
-        foreach ($this->ships as $ship) {
-            do {
-                $ship->setDirection(mt_rand(Ship::HORIZONTAL, Ship::VERTICAL));
-
-                $ship->setStartX(mt_rand(0, self::WIDTH - 1));
-
-                $ship->setStartY(mt_rand(0, self::HEIGT - 1));
-
-                $isShipLocatedCorrectly = $this->isSizeOfShipIsNotVeryLong($ship)
-                    && $this->isSpaceAroundShipIsEmpty($ship);
-            } while (!$isShipLocatedCorrectly);
-
-            $this->placeShipOnMap($ship);
-        }
-    }
-
-    /**
-     * This method is designed to handle shots from opponent
-     *
-     * @param int $x Shot's x-coordinate
-     * @param int $y Shot's y-coordinate
-     *
-     * @return bool Was shot successful and some ship was hit?
-     */
-    public function handleShot($x, $y)
-    {
-        if ($x < 0 || $x >= self::WIDTH ||
-            $y < 0 || $y >= self::HEIGT) {
-            return false;
-        }
-
-        $shipWasHit = false;
-        $slot = $this->getSlot($x, $y);
-
-        switch ($slot->getState()) {
-            case Slot::SLOT_IS_UNCOVERED:
-                $slot->setState(Slot::PLAYER_MISSED);
-                break;
-            case Slot::SLOT_IS_EMPTY:
-                $slot->setState(Slot::PLAYER_MISSED);
-                break;
-            case Slot::THERE_IS_A_SHIP:
-                $shipId = $slot->getShipId();
-                $ship = $this->ships[$shipId];
-
-                $isShipDead = $ship->addHitAndCheckForDeath();
-
-                if ($isShipDead) {
-                    $this->deadShips++;
-
-                    $areaAroundShip = $this->getAreaAroundShip($shipId);
-
-                    for ($i = $areaAroundShip['startX']; $i <= $areaAroundShip['endX']; $i++) {
-                        for ($j = $areaAroundShip['startY']; $j <= $areaAroundShip['endY']; $j++) {
-                            if ($this->slots[$i][$j]->getState() === Slot::SLOT_IS_UNCOVERED) {
-                                $this->slots[$i][$j]->setState(Slot::SLOT_IS_EMPTY);
-                            }
-                        }
-                    }
-
-                    for ($i = $ship->getStartX(); $i <= $ship->getEndX(); $i++) {
-                        for ($j = $ship->getStartY(); $j <= $ship->getEndY(); $j++) {
-                            $this->slots[$i][$j]->setState(Slot::SHIP_IS_DEAD);
-                        }
-                    }
-                } else {
-                    $slot->setState(Slot::SHIP_WAS_HIT);
-                }
-
-                $shipWasHit = true;
-                break;
-        }
-
-        $this->totalShots++;
-
-        return $shipWasHit;
-    }
-
-    /**
-     * This method is used for visual representation of Field's state
-     *
-     * It is important to know if we are drawing player's Field or
-     * enemy's because theirs visual representations are a little
-     * bit different
-     *
-     * @param bool $isEnemy
-     */
-    public function draw($isEnemy = false)
-    {
-        for ($y = 0; $y < self::HEIGT; $y++) {
-            echo '<tr>';
-
-            for ($x = 0; $x < self::WIDTH; $x++) {
-                echo '<td ';
-
-                switch ($this->slots[$x][$y]->getState()) {
-                    case Slot::SLOT_IS_UNCOVERED:
-                        echo 'class="uncovered"';
-                        break;
-                    case Slot::SLOT_IS_EMPTY:
-                        echo 'class="empty"';
-                        break;
-                    case Slot::PLAYER_MISSED:
-                        echo 'class="missed"';
-                        break;
-                    case Slot::THERE_IS_A_SHIP:
-                        echo $isEnemy === false
-                            ? 'class="ship"'
-                            : 'class="uncovered"';
-                        break;
-                    case Slot::SHIP_WAS_HIT:
-                        echo 'class="hit"';
-                        break;
-                    case Slot::SHIP_IS_DEAD:
-                        echo 'class="dead"';
-                        break;
-                }
-
-                echo ' data-x='.$x.' data-y='.$y.'></td>';
-            }
-
-            echo '</tr>';
-        }
-    }
 
     /**
      * It is used to determine if game is over or not.
@@ -233,7 +33,7 @@ class Board
      */
     public function allShipsAreDead()
     {
-        return ($this->totalAmountOfShips <= $this->deadShips)
+        return ($this->numOfShipsOnBoard <= $this->deadShips)
             ? true
             : false
         ;
@@ -268,9 +68,9 @@ class Board
      *
      * @return array Array of ships
      */
-    public function getShips()
+    public function getAliveShips()
     {
-        return $this->ships;
+        return $this->aliveShips;
     }
 
     /**
@@ -303,19 +103,21 @@ class Board
      */
     private function isSizeOfShipIsNotVeryLong($ship)
     {
-        $endX = $ship->getStartX();
-        $endY = $ship->getStartY();
+        $startX = $ship->getStartX();
+        $startY = $ship->getStartY();
 
         switch ($ship->getDirection()) {
             case Ship::HORIZONTAL:
-                $endX = $endX + $ship->getSize() - 1;
+                $endX = $startX + $ship->getSize() - 1;
                 break;
             case Ship::VERTICAL:
-                $endY = $endY + $ship->getSize() - 1;
+                $endY = $startY + $ship->getSize() - 1;
                 break;
+            default:
+                throw new \Exception("Ship doesn't have a direction!");
         }
 
-        if ($endX >= self::WIDTH || $endY >= self::HEIGT) {
+        if ($endX >= self::WIDTH || $endY >= self::HEIGHT) {
             return false;
         }
 
@@ -327,7 +129,7 @@ class Board
 
     /**
      * Checks if cells around ship is empty so we can place
-     * the ship on Field
+     * the ship on Board
      *
      * @param Ship $ship Checked ship
      *
@@ -339,7 +141,7 @@ class Board
 
         for ($x = $checkedArea['startX']; $x <= $checkedArea['endX']; $x++) {
             for ($y = $checkedArea['startY']; $y <= $checkedArea['endY']; $y++) {
-                if ($this->slots[$x][$y]->getState() === Slot::THERE_IS_A_SHIP) {
+                if ($this->cells[$x][$y]->getState() === Cell::THERE_IS_A_SHIP) {
                     return false;
                 }
             }
@@ -361,7 +163,7 @@ class Board
      */
     private function getAreaAroundShip($shipId)
     {
-        $ship = $this->ships[$shipId];
+        $ship = $this->aliveShips[$shipId];
 
         $areaStartX = $ship->getStartX() - 1;
         $areaStartY = $ship->getStartY() - 1;
@@ -382,8 +184,8 @@ class Board
             $areaEndX = self::WIDTH - 1;
         }
 
-        if ($areaEndY >= self::HEIGT) {
-            $areaEndY = self::HEIGT - 1;
+        if ($areaEndY >= self::HEIGHT) {
+            $areaEndY = self::HEIGHT - 1;
         }
 
         return [
@@ -400,7 +202,7 @@ class Board
      *
      * @param Ship $ship Ship to place on map
      */
-    private function placeShipOnMap($ship)
+    private function placeShipOnBoard($ship)
     {
         for ($x = $ship->getStartX(); $x <= $ship->getEndX(); $x++) {
             for ($y = $ship->getStartY(); $y <= $ship->getEndY(); $y++) {

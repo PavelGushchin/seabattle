@@ -1,15 +1,9 @@
 <?php
 
-/*
- * This file is part of the SeaBattle package.
- *
- * (c) Pavel Gushchin <pavel_gushchin@mail.ru>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace SeaBattle\Player\AI;
+
+use SeaBattle\Board\ShootingBoard;
+
 
 /**
  * ShootingAIInterface is supposed to represent 'brains' of CPU.
@@ -30,11 +24,6 @@ interface AIInterface
      *      'x' => $x,
      *      'y' => $y,
      *  ]
-     *
-     * @param array      $slots Array of slots
-     * @param array|null $ships Array of ships
-     *
-     * @return array Array of shot coordinates
      */
-    public function calculateCoordsForShooting($slots, $ships = null);
+    public function calculateCoordsForShooting(array $cells, ShootingBoard $boardForShooting): array;
 }

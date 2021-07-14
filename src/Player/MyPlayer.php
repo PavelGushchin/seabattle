@@ -2,42 +2,40 @@
 
 namespace SeaBattle\Player;
 
-use SeaBattle\Board\AbstractBoard;
-use SeaBattle\Board\MyBoard;
+use SeaBattle\Board\Cell;
 
 
 class MyPlayer extends AbstractPlayer
 {
-
-    public function __construct()
-    {
-        $this->board = new MyBoard();
-    }
-
     public function getCoordsForShooting(): array
     {
-        if (isset($_GET['x']) && isset($_GET['y'])) {
+        $x = isset($_GET["x"]) ? intval($_GET["x"]) : null;
+        $y = isset($_GET["y"]) ? intval($_GET["y"]) : null;
 
+        if ($this->coordsAreLegalForShooting($x, $y)) {
+            return [$x, $y];
         }
 
-        return [];
+        return [null, null];
     }
 
 
-    public function shootTo(AbstractBoard $attackedBoard, $x = null, $y = null): bool
+    private function coordsAreLegalForShooting(?int $x, ?int $y): bool
     {
-        $shipWasHit = $attackedBoard->handleShot($x, $y);
-
-        if ($attackedBoard->allShipsAreDead()) {
-            $this->setGameover(true);
-
-            if ($isEnemy === false) {
-                $this->setWinner(Game::I_AM_THE_WINNER);
-            } else {
-                $this->setWinner(Game::ENEMY_IS_THE_WINNER);
-            }
+        if ($x === null || $y === null) {
+            return false;
         }
 
-        return $shipWasHit;
+        $cell = $this->shootingBoard->getCell($x, $y);
+
+        if (! $cell) {
+            return false;
+        }
+
+        if ($cell->getStatus() === Cell::EMPTY) {
+            return true;
+        }
+
+        return false;
     }
 }

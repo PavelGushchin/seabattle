@@ -4,15 +4,11 @@ namespace SeaBattle;
 
 use SeaBattle\Player\AbstractPlayer;
 use SeaBattle\Player\AI\MediumAI;
-use SeaBattle\Player\AI\EasyAI;
+use SeaBattle\Player\AI\HardAI;
 use SeaBattle\Player\EnemyPlayer;
 use SeaBattle\Player\MyPlayer;
 
 
-/**
- * This class is playing a role of main controller
- * which connects all pieces of the project together
- */
 class Game
 {
     const NO_WINNER = "No winner";
@@ -32,17 +28,17 @@ class Game
     public function __construct()
     {
         $this->myPlayer = new MyPlayer();
-        $this->enemyPlayer = new EnemyPlayer();
+        $this->enemyPlayer = new EnemyPlayer(new MediumAI());
     }
 
 
     public function startNewGame()
     {
-        $this->myPlayer = new MyPlayer();
-        $this->myPlayer->placeShipsOnBoard();
+        $this->myPlayer->clearBoards();
+        $this->myPlayer->placeShipsOnMainBoard();
 
-        $this->enemyPlayer = new enemyPlayer(new MediumAI());
-        $this->enemyPlayer->placeShipsOnBoard();
+        $this->enemyPlayer->clearBoards();
+        $this->enemyPlayer->placeShipsOnMainBoard();
 
         $this->theWinner = self::NO_WINNER;
         $this->turn = self::MY_TURN;
@@ -57,7 +53,12 @@ class Game
 
         /** My shooting **/
         [$x, $y] = $this->myPlayer->getCoordsForShooting();
-        $wasShipHit = $this->enemyPlayer->answerIfShipWasHit($x, $y);
+
+        if ($x === null || $y === null) {
+            return;
+        }
+
+        $wasShipHit = $this->enemyPlayer->checkIfShipWasHit($x, $y);
         $this->myPlayer->writeResultOfShooting($x, $y, $wasShipHit);
 
         $this->turn = $wasShipHit ? self::MY_TURN : self::ENEMY_TURN;
@@ -70,7 +71,7 @@ class Game
         /** Enemy's shooting **/
         while ($this->turn === self::ENEMY_TURN) {
             [$x, $y] = $this->enemyPlayer->getCoordsForShooting();
-            $wasShipHit = $this->myPlayer->answerIfShipWasHit($x, $y);
+            $wasShipHit = $this->myPlayer->checkIfShipWasHit($x, $y);
             $this->enemyPlayer->writeResultOfShooting($x, $y, $wasShipHit);
 
             $this->turn = $wasShipHit ? self::ENEMY_TURN : self::MY_TURN;
@@ -85,7 +86,7 @@ class Game
 
     public function startAutobattle()
     {
-        $this->myPlayer = new MyPlayer(new EasyAI());
+        $this->myPlayer = new enemyPlayer(new HardAI());
         $this->myPlayer->placeShipsOnBoard();
 
         $this->enemyPlayer = new enemyPlayer(new MediumAI());
