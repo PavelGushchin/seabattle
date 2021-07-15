@@ -1,6 +1,6 @@
 <?php
 
-namespace SeaBattle\Player\AI;
+namespace SeaBattle\Player\AI\ShootingAI;
 
 use SeaBattle\Field\Field;
 use SeaBattle\Field\Slot;
@@ -12,7 +12,7 @@ use SeaBattle\Field\Slot;
  *
  * @author Pavel Gushchin <pavel_gushchin@mail.ru>
  */
-class EasyAI implements IShootingAI
+class EasyAI implements InterfaceShootingAI
 {
     const SHOOT_HORIZONTALLY = 1;
     const SHOOT_VERTICALLY = 2;
@@ -71,12 +71,11 @@ class EasyAI implements IShootingAI
      *      'y' => $y,
      *  ]
      *
-     * @param array      $slots Array with slots
-     * @param array|null $ships Array with ships
+     * @param AbstractBoard|null $shootingBoard Array with ships
      *
      * @return array Array of shot coordinates
      */
-    public function calculateCoordsForShooting($slots, $ships = null)
+    public function getCoordsForShooting(AbstractBoard $shootingBoard = null)
     {
         if (empty($this->partsOfdamagedShip)) {
             $coords = $this->randomShooter->calculateCoordsForShooting($slots);
@@ -95,7 +94,7 @@ class EasyAI implements IShootingAI
 
         if ($slotState === Slot::THERE_IS_A_SHIP) {
             $shipId = $slots[$x][$y]->getShipId();
-            $ship = $ships[$shipId];
+            $ship = $shootingBoard[$shipId];
 
             $isShipGoingToDie = $ship->getSize() === $ship->getHits() + 1;
 

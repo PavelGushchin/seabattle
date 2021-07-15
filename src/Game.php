@@ -2,13 +2,10 @@
 
 namespace SeaBattle;
 
-use SeaBattle\Board\AbstractCell;
-use SeaBattle\Board\MainBoard;
-use SeaBattle\Board\ShootingBoard;
-use SeaBattle\Player\AbstractPlayer;
-use SeaBattle\Player\AI;
-use SeaBattle\Player\EnemyPlayer;
-use SeaBattle\Player\MyPlayer;
+use SeaBattle\Board\Cell;
+use SeaBattle\Board\Board;
+use SeaBattle\Player\Player;
+use SeaBattle\Player\AI\ShootingAI\MediumAI;
 
 
 class Game
@@ -20,8 +17,8 @@ class Game
     const MY_TURN = "My turn";
     const ENEMY_TURN = "Enemy's turn";
 
-    private AbstractPlayer $myPlayer;
-    private AbstractPlayer $enemyPlayer;
+    private Player $myPlayer;
+    private Player $enemyPlayer;
 
     private string $theWinner = self::NO_WINNER;
     private string $turn = self::MY_TURN;
@@ -29,13 +26,8 @@ class Game
 
     public function __construct()
     {
-        $this->myPlayer = new MyPlayer();
-
-        $this->enemyPlayer = new EnemyPlayer(
-            new MainBoard(),
-            new ShootingBoard(),
-            new AI\MediumAI(),
-        );
+        $this->myPlayer = new Player();
+        $this->enemyPlayer = new Player(new MediumAI());
     }
 
 
@@ -93,23 +85,16 @@ class Game
 
     public function startAutobattle()
     {
-        $this->myPlayer = new enemyPlayer(new HardAI());
-        $this->myPlayer->placeShipsOnBoard();
 
-        $this->enemyPlayer = new enemyPlayer(new MediumAI());
-        $this->enemyPlayer->placeShipsOnBoard();
-
-        $this->theWinner = self::NO_WINNER;
-        $this->turn = self::MY_TURN;
     }
 
 
-    public function getMyPlayer(): AbstractPlayer
+    public function getMyPlayer(): Player
     {
         return $this->myPlayer;
     }
 
-    public function getEnemyPlayer(): AbstractPlayer
+    public function getEnemyPlayer(): Player
     {
         return $this->enemyPlayer;
     }

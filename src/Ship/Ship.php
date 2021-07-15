@@ -3,10 +3,10 @@
 namespace SeaBattle\Ship;
 
 
-class Ship extends AbstractShip
+class Ship
 {
-    const HORIZONTAL = "Ship has horizontal direction";
-    const VERTICAL = "Ship has vertical direction";
+    const HORIZONTAL = 0;
+    const VERTICAL = 1;
 
     protected int $id;
     protected bool $isDead = false;

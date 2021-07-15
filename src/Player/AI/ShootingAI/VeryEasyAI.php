@@ -1,6 +1,6 @@
 <?php
 
-namespace SeaBattle\Player\AI;
+namespace SeaBattle\Player\AI\ShootingAI;
 
 use SeaBattle\Field\Slot;
 use SeaBattle\Field\Field;
@@ -12,7 +12,7 @@ use SeaBattle\Field\Field;
  *
  * @author Pavel Gushchin <pavel_gushchin@mail.ru>
  */
-class VeryEasyAI implements IShootingAI
+class VeryEasyAI implements InterfaceShootingAI
 {
     /**
      * Main method of the class.
@@ -24,12 +24,11 @@ class VeryEasyAI implements IShootingAI
      *      'y' => $y,
      *  ]
      *
-     * @param array      $slots Array with slots
-     * @param array|null $ships Array with ships
+     * @param AbstractBoard|null $shootingBoard Array with ships
      *
      * @return array Array of shot coordinates
      */
-    public function calculateCoordsForShooting($slots, $ships = null)
+    public function getCoordsForShooting(AbstractBoard $shootingBoard = null)
     {
         do {
             $x = mt_rand(0, Field::WIDTH - 1);

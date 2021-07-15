@@ -3,7 +3,7 @@
 namespace SeaBattle\Player\AI\PlacingShipsAI;
 
 
-class SmartAI implements IPlacingShipsAI
+class SmartAI implements InterfacePlacingShipsAI
 {
 
 }

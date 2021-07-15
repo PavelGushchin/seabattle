@@ -1,9 +1,9 @@
 <?php
 
-namespace SeaBattle\Board\Cell;
+namespace SeaBattle\Board;
 
 
-class Cell extends AbstractCell
+class Cell
 {
     const NONE = 0;
     const SHIP = 1;
@@ -12,19 +12,19 @@ class Cell extends AbstractCell
     const MISSED = 4;
 
 
-    protected $state = self::NONE;
+    protected int $state = self::NONE;
 
     /** Unique identifier of a ship that possibly placed in this cell **/
     protected ?int $shipId = null;
 
 
-    public function getState()
+    public function getState(): int
     {
         return $this->state;
     }
 
 
-    public function setState($state)
+    public function setState(int $state)
     {
         $this->state = $state;
     }

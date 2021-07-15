@@ -1,13 +1,13 @@
 <?php
 
-namespace SeaBattle\Player\AI;
+namespace SeaBattle\Player\AI\ShootingAI;
 
-use SeaBattle\Board\AbstractShootingBoard;
+use SeaBattle\Board\ShootingBoard;
 
 
-class HardAI implements IShootingAI
+class HardAI implements InterfaceShootingAI
 {
-    public function calculateCoordsForShooting(array $cells, AbstractShootingBoard $boardForShooting): array
+    public function getCoordsForShooting(AbstractBoard $shootingBoard): array
     {
         // TODO: Implement calculateCoordsForShooting() method.
     }

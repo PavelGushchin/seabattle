@@ -2,25 +2,77 @@
 
 namespace SeaBattle\Board;
 
+use SeaBattle\Board\Cell;
 use SeaBattle\Ship\Ship;
 
 
-abstract class AbstractMainBoard extends AbstractBoard
+class Board
 {
+    const WIDTH = 10;
+    const HEIGHT = 10;
+
+    protected array $cells = [];
+    protected array $ships = [];
+
+
+    public function clear() {}
+    public function isShipHere(int $x, int $y): bool {}
+
+
+    public function __construct()
+    {
+        for ($x = 0; $x < self::WIDTH; $x++) {
+            for ($y = 0; $y < self::HEIGHT; $y++) {
+                $this->cells[$x][$y] = new Cell();
+            }
+        }
+    }
+
+
+    public function getAllCells(): array
+    {
+        return $this->cells;
+    }
+
+
+    public function getCell(int $x, int $y): Cell
+    {
+        return $this->cells[$x][$y];
+    }
+
+
+    public function getAllShips(): array
+    {
+        return $this->ships;
+    }
+
+
+    public function getShip(int $shipId): Ship
+    {
+        return $this->ships[$shipId];
+    }
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * Player shoots to [$x, $y] and you have to check
      * if the Board has a ship there or not
      */
-    abstract public function checkIfShipWasHit(int $x, int $y): bool;
+    public function checkIfShipWasHit(int $x, int $y): bool
+    {}
 
 
-    abstract public function placeShipsOnBoard();
-
-    /**
-     * Clear the Board
-     */
-    abstract public function clear();
-
+    public function placeShipsOnBoard()
+    {}
 
 
     protected array $aliveShips = [];
@@ -49,11 +101,11 @@ abstract class AbstractMainBoard extends AbstractBoard
 
 
     /**
-     * This method randomly places ships on AbstractBoard.
+     * This method randomly places ships on Board.
      *
      * First, it choose random x and y coordinate for ship's head.
      * Second, it checks if ship can be located there: if can -
-     * it places the ship on AbstractBoard, but if can not - it chooses
+     * it places the ship on Board, but if can not - it chooses
      * another x and y coordinates.
      */
     public function placeShipsRandomly()
@@ -164,7 +216,7 @@ abstract class AbstractMainBoard extends AbstractBoard
 
     /**
      * Checks if cells around ship is empty so we can place
-     * the ship on AbstractBoard
+     * the ship on Board
      *
      * @param Ship $ship Checked ship
      *
@@ -176,7 +228,7 @@ abstract class AbstractMainBoard extends AbstractBoard
 
         for ($x = $checkedArea['startX']; $x <= $checkedArea['endX']; $x++) {
             for ($y = $checkedArea['startY']; $y <= $checkedArea['endY']; $y++) {
-                if ($this->cells[$x][$y]->getState() === AbstractCell::THERE_IS_A_SHIP) {
+                if ($this->cells[$x][$y]->getState() === Cell::THERE_IS_A_SHIP) {
                     return false;
                 }
             }
@@ -241,9 +293,103 @@ abstract class AbstractMainBoard extends AbstractBoard
     {
         for ($x = $ship->getStartX(); $x <= $ship->getEndX(); $x++) {
             for ($y = $ship->getStartY(); $y <= $ship->getEndY(); $y++) {
-                $this->cells[$x][$y]->setState(AbstractCell::THERE_IS_A_SHIP);
+                $this->cells[$x][$y]->setState(Cell::THERE_IS_A_SHIP);
                 $this->cells[$x][$y]->setShipId($ship->getId());
             }
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+    /**
+     * This method is designed to handle shots from opponent
+     *
+     * @param int $x Shot's x-coordinate
+     * @param int $y Shot's y-coordinate
+     *
+     * @return bool Was shot successful and some ship was hit?
+     */
+    public function handleShot($x, $y)
+    {
+        if ($x < 0 || $x >= self::WIDTH ||
+            $y < 0 || $y >= self::HEIGHT) {
+            return false;
+        }
+
+        $shipWasHit = false;
+        $slot = $this->getSlot($x, $y);
+
+        switch ($slot->getState()) {
+            case Slot::SLOT_IS_UNCOVERED:
+                $slot->setState(Slot::PLAYER_MISSED);
+                break;
+            case Slot::SLOT_IS_NONE:
+                $slot->setState(Slot::PLAYER_MISSED);
+                break;
+            case Slot::THERE_IS_A_SHIP:
+                $shipId = $slot->getShipId();
+                $ship = $this->aliveShips[$shipId];
+
+                $isShipDead = $ship->addHitAndCheckForDeath();
+
+                if ($isShipDead) {
+                    $this->deadShips++;
+
+                    $areaAroundShip = $this->getAreaAroundShip($shipId);
+
+                    for ($i = $areaAroundShip['startX']; $i <= $areaAroundShip['endX']; $i++) {
+                        for ($j = $areaAroundShip['startY']; $j <= $areaAroundShip['endY']; $j++) {
+                            if ($this->slots[$i][$j]->getState() === Slot::SLOT_IS_UNCOVERED) {
+                                $this->slots[$i][$j]->setState(Slot::SLOT_IS_NONE);
+                            }
+                        }
+                    }
+
+                    for ($i = $ship->getStartX(); $i <= $ship->getEndX(); $i++) {
+                        for ($j = $ship->getStartY(); $j <= $ship->getEndY(); $j++) {
+                            $this->slots[$i][$j]->setState(Slot::SHIP_IS_DEAD);
+                        }
+                    }
+                } else {
+                    $slot->setState(Slot::SHIP_WAS_HIT);
+                }
+
+                $shipWasHit = true;
+                break;
+        }
+
+        $this->totalShots++;
+
+        return $shipWasHit;
+    }
+
+
+
+
+
+
+
+
+
+    /**
+     * It is used to determine if game is over or not.
+     *
+     * @return bool
+     */
+    public function allShipsAreDead()
+    {
+        return ($this->numOfShipsOnBoard <= $this->deadShips)
+            ? true
+            : false
+            ;
+    }
+
 }
