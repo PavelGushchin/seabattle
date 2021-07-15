@@ -3,7 +3,7 @@
 namespace SeaBattle\Ship;
 
 
-class Ship
+class Ship extends AbstractShip
 {
     const HORIZONTAL = "Ship has horizontal direction";
     const VERTICAL = "Ship has vertical direction";

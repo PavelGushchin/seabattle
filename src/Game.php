@@ -2,9 +2,11 @@
 
 namespace SeaBattle;
 
+use SeaBattle\Board\AbstractCell;
+use SeaBattle\Board\MainBoard;
+use SeaBattle\Board\ShootingBoard;
 use SeaBattle\Player\AbstractPlayer;
-use SeaBattle\Player\AI\MediumAI;
-use SeaBattle\Player\AI\HardAI;
+use SeaBattle\Player\AI;
 use SeaBattle\Player\EnemyPlayer;
 use SeaBattle\Player\MyPlayer;
 
@@ -28,7 +30,12 @@ class Game
     public function __construct()
     {
         $this->myPlayer = new MyPlayer();
-        $this->enemyPlayer = new EnemyPlayer(new MediumAI());
+
+        $this->enemyPlayer = new EnemyPlayer(
+            new MainBoard(),
+            new ShootingBoard(),
+            new AI\MediumAI(),
+        );
     }
 
 
@@ -63,7 +70,7 @@ class Game
 
         $this->turn = $wasShipHit ? self::MY_TURN : self::ENEMY_TURN;
 
-        if ($this->enemyPlayer->isLost()) {
+        if ($this->myPlayer->checkIfWon()) {
             $this->theWinner = self::I_AM_THE_WINNER;
             return;
         }
@@ -76,7 +83,7 @@ class Game
 
             $this->turn = $wasShipHit ? self::ENEMY_TURN : self::MY_TURN;
 
-            if ($this->myPlayer->isLost()) {
+            if ($this->enemyPlayer->checkIfWon()) {
                 $this->theWinner = self::ENEMY_IS_THE_WINNER;
                 return;
             }

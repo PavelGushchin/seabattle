@@ -2,15 +2,15 @@
 
 namespace SeaBattle\Player;
 
-use SeaBattle\Player\AI\AIInterface;
+use SeaBattle\Player\AI\IShootingAI;
 
 
 class EnemyPlayer extends AbstractPlayer
 {
-    protected AIInterface $AI;
+    protected IShootingAI $AI;
 
 
-    public function __construct(AIInterface $AI)
+    public function __construct(IShootingAI $AI)
     {
         parent::__construct();
         $this->AI = $AI;

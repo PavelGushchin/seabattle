@@ -12,7 +12,7 @@ use SeaBattle\Field\Field;
  *
  * @author Pavel Gushchin <pavel_gushchin@mail.ru>
  */
-class VeryEasyAI implements AIInterface
+class VeryEasyAI implements IShootingAI
 {
     /**
      * Main method of the class.

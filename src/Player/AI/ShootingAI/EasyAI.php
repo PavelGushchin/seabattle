@@ -12,7 +12,7 @@ use SeaBattle\Field\Slot;
  *
  * @author Pavel Gushchin <pavel_gushchin@mail.ru>
  */
-class EasyAI implements AIInterface
+class EasyAI implements IShootingAI
 {
     const SHOOT_HORIZONTALLY = 1;
     const SHOOT_VERTICALLY = 2;

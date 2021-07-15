@@ -2,29 +2,23 @@
 
 namespace SeaBattle\Player;
 
-use SeaBattle\Board\MainBoard;
-use SeaBattle\Board\ShootingBoard;
+use SeaBattle\Board\AbstractMainBoard;
+use SeaBattle\Board\AbstractShootingBoard;
 
 
 abstract class AbstractPlayer
 {
-    protected MainBoard $myBoard;
-    protected ShootingBoard $shootingBoard;
+    protected AbstractMainBoard $mainBoard;
+    protected AbstractShootingBoard $shootingBoard;
 
 
+    abstract public function __construct();
     abstract public function getCoordsForShooting(): array;
-
-
-    public function __construct()
-    {
-        $this->myBoard = new MainBoard();
-        $this->shootingBoard = new ShootingBoard();
-    }
 
 
     public function checkIfShipWasHit(int $x, int $y): bool
     {
-        return $this->myBoard->checkIfShipWasHit($x, $y);
+        return $this->mainBoard->checkIfShipWasHit($x, $y);
     }
 
 
@@ -34,15 +28,21 @@ abstract class AbstractPlayer
     }
 
 
-    public function placeShipsOnBoard()
+    public function checkIfWon(): bool
     {
-        $this->myBoard->placeShipsOnBoard();
+        return $this->shootingBoard->areAllShipsKilled();
     }
 
 
-    public function isLost(): bool
+    public function placeShipsOnMainBoard()
     {
-        return $this->myBoard->areAllShipsDead();
+        $this->mainBoard->placeShipsOnBoard();
     }
 
+
+    public function clearBoards()
+    {
+        $this->mainBoard->clear();
+        $this->shootingBoard->clear();
+    }
 }

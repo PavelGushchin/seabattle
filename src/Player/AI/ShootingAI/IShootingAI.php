@@ -2,7 +2,7 @@
 
 namespace SeaBattle\Player\AI;
 
-use SeaBattle\Board\ShootingBoard;
+use SeaBattle\Board\AbstractShootingBoard;
 
 
 /**
@@ -13,7 +13,7 @@ use SeaBattle\Board\ShootingBoard;
  *
  * @author Pavel Gushchin <pavel_gushchin@mail.ru>
  */
-interface AIInterface
+interface IShootingAI
 {
     /**
      * The main goal of this method is to return an array
@@ -25,5 +25,5 @@ interface AIInterface
      *      'y' => $y,
      *  ]
      */
-    public function calculateCoordsForShooting(array $cells, ShootingBoard $boardForShooting): array;
+    public function calculateCoordsForShooting(array $cells, AbstractShootingBoard $boardForShooting): array;
 }

@@ -3,7 +3,7 @@
 namespace SeaBattle\Player\AI;
 
 use SeaBattle\Board;
-use SeaBattle\Board\ShootingBoard;
+use SeaBattle\Board\AbstractShootingBoard;
 use SeaBattle\Cell;
 
 
@@ -13,7 +13,7 @@ use SeaBattle\Cell;
  *
  * @author Pavel Gushchin <pavel_gushchin@mail.ru>
  */
-class MediumAI implements AIInterface
+class MediumAI implements IShootingAI
 {
     const SHOOT_HORIZONTALLY = 1;
     const SHOOT_VERTICALLY = 2;
@@ -72,7 +72,7 @@ class MediumAI implements AIInterface
      *
      * @return array Array of shot coordinates
      */
-    public function calculateCoordsForShooting(array $cells, ShootingBoard $boardForShooting): array
+    public function calculateCoordsForShooting(array $cells, AbstractShootingBoard $boardForShooting): array
     {
         $this->variantsForNextShot = [];
         $this->setValuesForSlots($slots, $ships);

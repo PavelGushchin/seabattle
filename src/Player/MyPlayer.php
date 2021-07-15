@@ -2,11 +2,20 @@
 
 namespace SeaBattle\Player;
 
-use SeaBattle\Board\Cell;
+use SeaBattle\Board\AbstractCell;
+use SeaBattle\Board\MainBoard;
+use SeaBattle\Board\ShootingBoard;
 
 
 class MyPlayer extends AbstractPlayer
 {
+    public function __construct()
+    {
+        $this->mainBoard = new MainBoard();
+        $this->shootingBoard = new ShootingBoard();
+    }
+
+
     public function getCoordsForShooting(): array
     {
         $x = isset($_GET["x"]) ? intval($_GET["x"]) : null;
@@ -32,7 +41,7 @@ class MyPlayer extends AbstractPlayer
             return false;
         }
 
-        if ($cell->getStatus() === Cell::EMPTY) {
+        if ($cell->getStatus() === AbstractCell::NONE) {
             return true;
         }
 
