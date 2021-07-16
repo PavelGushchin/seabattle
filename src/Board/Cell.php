@@ -5,14 +5,13 @@ namespace SeaBattle\Board;
 
 class Cell
 {
-    const NONE = 0;
+    const EMPTY = 0;
     const SHIP = 1;
-    const HIT_SHIP = 2;
-    const DEAD_SHIP = 3;
-    const MISSED = 4;
+    const SHIP_HIT = 2;
+    const SHIP_KILLED = 3;
+    const PLAYER_MISSED = 4;
 
-
-    protected int $state = self::NONE;
+    protected int $state = self::EMPTY;
 
     /** Unique identifier of a ship that possibly placed in this cell **/
     protected ?int $shipId = null;
@@ -24,7 +23,7 @@ class Cell
     }
 
 
-    public function setState(int $state)
+    public function setState(int $state): void
     {
         $this->state = $state;
     }
@@ -36,7 +35,7 @@ class Cell
     }
 
 
-    public function setShipId(int $shipId)
+    public function setShipId(int $shipId): void
     {
         $this->shipId = $shipId;
     }

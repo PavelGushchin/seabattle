@@ -44,7 +44,9 @@ $_SESSION['game'] = serialize($game);
                 <h2>My ships</h2>
     
                 <div id="mainBoard">
-                    <?php $game->getMyPlayer()->printMainBoard(); ?>
+                    <?php
+                        echo $game->getMyPlayer()->printMainBoard();
+                    ?>
                 </div>
             </div>
     
@@ -52,7 +54,9 @@ $_SESSION['game'] = serialize($game);
                 <h2>Enemy's ships</h2>
     
                 <div id="shootingBoard">
-                    <?php $game->getMyPlayer()->printShootingBoard(); ?>
+                    <?php
+                        echo $game->getMyPlayer()->printShootingBoard();
+                    ?>
                 </div>
             </div>
 

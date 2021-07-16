@@ -17,11 +17,11 @@ class Game
     const MY_TURN = "My turn";
     const ENEMY_TURN = "Enemy's turn";
 
-    private Player $myPlayer;
-    private Player $enemyPlayer;
+    protected Player $myPlayer;
+    protected Player $enemyPlayer;
 
-    private string $theWinner = self::NO_WINNER;
-    private string $turn = self::MY_TURN;
+    protected string $theWinner = self::NO_WINNER;
+    protected string $turn = self::MY_TURN;
 
 
     public function __construct()
@@ -34,10 +34,10 @@ class Game
     public function startNewGame()
     {
         $this->myPlayer->clearBoards();
-        $this->myPlayer->placeShipsOnMainBoard();
+        $this->myPlayer->createShipsOnMainBoard();
 
         $this->enemyPlayer->clearBoards();
-        $this->enemyPlayer->placeShipsOnMainBoard();
+        $this->enemyPlayer->createShipsOnMainBoard();
 
         $this->theWinner = self::NO_WINNER;
         $this->turn = self::MY_TURN;
@@ -50,32 +50,44 @@ class Game
             return;
         }
 
+        $myPlayer = $this->myPlayer;
+        $enemyPlayer = $this->enemyPlayer;
+
         /** My shooting **/
-        [$x, $y] = $this->myPlayer->getCoordsForShooting();
+        [$x, $y] = $myPlayer->getCoordsForShooting();
 
         if ($x === null || $y === null) {
             return;
         }
 
-        $wasShipHit = $this->enemyPlayer->checkIfShipWasHit($x, $y);
-        $this->myPlayer->writeResultOfShooting($x, $y, $wasShipHit);
+        $resultOfShooting = $enemyPlayer->handleShotAndGiveResult($x, $y);
+        $myPlayer->writeResultOfShooting($x, $y, $resultOfShooting);
 
-        $this->turn = $wasShipHit ? self::MY_TURN : self::ENEMY_TURN;
+        if ($resultOfShooting === Player::MISSED) {
+            $this->turn = self::ENEMY_TURN;
+        } else {
+            $this->turn = self::MY_TURN;
+        }
 
-        if ($this->myPlayer->checkIfWon()) {
+        if ($myPlayer->checkIfWon()) {
             $this->theWinner = self::I_AM_THE_WINNER;
             return;
         }
 
         /** Enemy's shooting **/
         while ($this->turn === self::ENEMY_TURN) {
-            [$x, $y] = $this->enemyPlayer->getCoordsForShooting();
-            $wasShipHit = $this->myPlayer->checkIfShipWasHit($x, $y);
-            $this->enemyPlayer->writeResultOfShooting($x, $y, $wasShipHit);
+            [$x, $y] = $enemyPlayer->getCoordsForShooting();
 
-            $this->turn = $wasShipHit ? self::ENEMY_TURN : self::MY_TURN;
+            $resultOfShooting = $enemyPlayer->handleShotAndGiveResult($x, $y);
+            $myPlayer->writeResultOfShooting($x, $y, $resultOfShooting);
 
-            if ($this->enemyPlayer->checkIfWon()) {
+            if ($resultOfShooting === Player::MISSED) {
+                $this->turn = self::ENEMY_TURN;
+            } else {
+                $this->turn = self::MY_TURN;
+            }
+
+            if ($enemyPlayer->checkIfWon()) {
                 $this->theWinner = self::ENEMY_IS_THE_WINNER;
                 return;
             }
