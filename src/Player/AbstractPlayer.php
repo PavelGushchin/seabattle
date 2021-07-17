@@ -3,19 +3,16 @@
 namespace SeaBattle\Player;
 
 use SeaBattle\Board\AbstractBoard;
-use SeaBattle\Board\Cell;
-use SeaBattle\Board\MainBoard;
+use SeaBattle\Board\Square;
+use SeaBattle\Board\ShipBoard;
 use SeaBattle\Board\ShootingBoard;
-use SeaBattle\Player\AI\PlacingShipsAI\InterfacePlacingShipsAI;
-use SeaBattle\Player\AI\PlacingShipsAI\RandomAI;
-use SeaBattle\Player\AI\ShootingAI\InterfaceShootingAI;
 
 
 abstract class AbstractPlayer
 {
-    public const HIT = "Answer to enemy that he hit my ship";
-    public const KILLED = "Answer to enemy that he killed my ship";
-    public const MISSED = "Answer to enemy that he missed";
+    public const YOU_HIT_MY_SHIP = "Answer to opponent that he hit my ship";
+    public const YOU_KILLED_MY_SHIP = "Answer to opponent that he killed my ship";
+    public const YOU_MISSED = "Answer to opponent that he missed";
 
     protected array $needToCreateTheseShips = [
         ["size" => 4, "amount" => 1],
@@ -24,9 +21,8 @@ abstract class AbstractPlayer
         ["size" => 1, "amount" => 4],
     ];
 
-    protected AbstractBoard $mainBoard;
+    protected AbstractBoard $shipBoard;
     protected AbstractBoard $shootingBoard;
-    protected InterfacePlacingShipsAI $placingShipsAI;
 
 
     abstract public function getCoordsForShooting(): array;
@@ -34,9 +30,8 @@ abstract class AbstractPlayer
 
     public function __construct()
     {
-        $this->mainBoard = new MainBoard();
+        $this->shipBoard = new ShipBoard();
         $this->shootingBoard = new ShootingBoard();
-        $this->placingShipsAI = new RandomAI();
     }
 
 
@@ -44,22 +39,22 @@ abstract class AbstractPlayer
     {
         foreach ($this->needToCreateTheseShips as $ships) {
             for ($i = 0; $i < $ships["amount"]; $i++) {
-                $this->mainBoard->addShip($ships["size"]);
+                $this->shipBoard->addShip($ships["size"]);
             }
         }
 
-        $this->placingShipsAI->placeShipsOnBoard($this->mainBoard);
+        $this->placeShipsOnBoard($this->shipBoard);
     }
 
 
     public function clearBoards(): void
     {
-        $this->mainBoard = new MainBoard();
+        $this->shipBoard = new ShipBoard();
         $this->shootingBoard = new ShootingBoard();
     }
 
 
-    public function writeResultOfShooting(int $x, int $y, bool $wasShipHit): void
+    public function writeResultOfShooting(int $x, int $y, int $resultOfShooting): void
     {
 
     }
@@ -67,19 +62,13 @@ abstract class AbstractPlayer
 
     public function checkIfWon(): bool
     {
-        return $this->shootingBoard->getNumberOfKilledShips() === $this->mainBoard->getNumberOfAllShips();
-    }
-
-
-    public function setPlacingShipsAI(InterfacePlacingShipsAI $placingShipsAI): void
-    {
-        $this->placingShipsAI = $placingShipsAI;
+        return $this->shootingBoard->getNumberOfKilledShips() === $this->shipBoard->getNumberOfAllShips();
     }
 
 
     public function printMainBoard(): string
     {
-        return $this->mainBoard->print();
+        return $this->shipBoard->print();
     }
 
 
@@ -89,56 +78,46 @@ abstract class AbstractPlayer
     }
 
 
-    public function handleShotAndGiveResult(int $x, int $y): int
+    public function handleShotAndGiveAnswer(int $x, int $y): string
     {
-        $cell = $this->mainBoard->getCell($x, $y);
+        $attackedSquare = $this->shipBoard->getSquare($x, $y);
 
-        switch ($cell->getState()) {
-            case Cell::SLOT_IS_UNCOVERED:
-                $cell->setState(Cell::PLAYER_MISSED);
-                break;
-            case Cell::SLOT_IS_NONE:
-                $cell->setState(Cell::PLAYER_MISSED);
-                break;
-            case Cell::THERE_IS_A_SHIP:
-                $shipId = $cell->getShipId();
-                $ship = $this->aliveShips[$shipId];
-
-                $isShipDead = $ship->addHitAndCheckForDeath();
-
-                if ($isShipDead) {
-                    $this->deadShips++;
-
-                    $areaAroundShip = $this->getAreaAroundShip($shipId);
-
-                    for ($i = $areaAroundShip['startX']; $i <= $areaAroundShip['endX']; $i++) {
-                        for ($j = $areaAroundShip['startY']; $j <= $areaAroundShip['endY']; $j++) {
-                            if ($this->slots[$i][$j]->getState() === Cell::SLOT_IS_UNCOVERED) {
-                                $this->slots[$i][$j]->setState(Cell::SLOT_IS_NONE);
-                            }
-                        }
-                    }
-
-                    for ($i = $ship->getStartX(); $i <= $ship->getEndX(); $i++) {
-                        for ($j = $ship->getStartY(); $j <= $ship->getEndY(); $j++) {
-                            $this->slots[$i][$j]->setState(Cell::SHIP_IS_DEAD);
-                        }
-                    }
-                } else {
-                    $cell->setState(Cell::SHIP_WAS_HIT);
-                }
-
-                $shipWasHit = true;
-                break;
+        if ($attackedSquare === null) {
+            return self::YOU_MISSED;
         }
 
-        return $shipWasHit;
+        switch ($attackedSquare->getState()) {
+            case Square::EMPTY:
+                $attackedSquare->setState(Square::MISSED);
+                return self::YOU_MISSED;
+            case Square::SHIP:
+                $ship = $attackedSquare->getShip();
+
+                $wasShipKilled = $this->hitMyShipAndCheckIfItWasKilled($ship);
+
+                if ($isShipKilled) {
+                    $this->markShipAsKilledOnBoard($this->shipBoard, $shipId);
+                    return self::YOU_KILLED_MY_SHIP;
+                }
+
+                $attackedSquare->setState(Square::HIT_SHIP);
+                return self::YOU_HIT_MY_SHIP;
+        }
+
+        return self::YOU_MISSED;
     }
 
 
-    protected function checkIfCoordsAreLegalForShooting(?int $x, ?int $y): bool
+    protected function hitMyShipAndCheckIfItWasKilled(int $shipId): bool
     {
+        $isShipKilled = $ship?->addHit()?->checkIsKilled();
 
+        return $ship?->addHit()?->checkIsKilled();
     }
 
+    protected function markShipAsKilledOnBoard(AbstractBoard $board, int $shipId): void
+    {
+        $ship = $board->getShipById($shipId);
+
+    }
 }

@@ -10,9 +10,9 @@ class ShootingBoard extends AbstractBoard
     protected array $killedShips = [];
 
 
-    public function addKilledShip(int $size): void
+    public function addKilledShip(int $size, int $direction, array $headCoords): void
     {
-        $this->killedShips[] = new Ship($size);
+        $this->killedShips[] = new Ship($size, $direction, $headCoords);
     }
 
 

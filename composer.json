@@ -1,21 +1,28 @@
 {
-  "name": "pavelgushchin/seabattle",
-  "description": "This project is a popular board game 'Sea Battle' for one player versus CPU",
-  "keywords": [
-    "Sea Battle"
-  ],
-  "homepage": "https://github.com/PavelGushchin/seabattle",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Pavel Gushchin",
-      "email": "pavel_gushchin@mail.ru"
+    "name": "pavelgushchin/seabattle",
+    "type": "project",
+    "description": "This project is my implementation of a popular board game 'Sea Battle'",
+    "keywords": [
+        "Sea Battle",
+        "PHP 8"
+    ],
+    "homepage": "https://github.com/PavelGushchin/seabattle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pavel Gushchin",
+            "email": "pavel_gushchin@mail.ru"
+        }
+    ],
+    "require": {
+        "php": "^8.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "SeaBattle\\": "src/"
+        }
     }
-  ],
-  "require-dev": {
-    "phpunit/phpunit": "^9.5"
-  },
-  "autoload": {
-    "psr-4": { "SeaBattle\\": "src/" }
-  }
 }

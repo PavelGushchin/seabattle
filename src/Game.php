@@ -2,7 +2,7 @@
 
 namespace SeaBattle;
 
-use SeaBattle\Board\Cell;
+use SeaBattle\Board\Square;
 use SeaBattle\Board\AbstractBoard;
 use SeaBattle\Player\AbstractPlayer;
 use SeaBattle\Player\MyPlayer;
@@ -62,36 +62,36 @@ class Game
             return;
         }
 
-        $resultOfShooting = $enemyPlayer->handleShotAndGiveResult($x, $y);
-        $myPlayer->writeResultOfShooting($x, $y, $resultOfShooting);
-
-        if ($resultOfShooting === MyPlayer::MISSED) {
-            $this->turn = self::ENEMY_TURN;
-        } else {
-            $this->turn = self::MY_TURN;
-        }
+        $answerFromEnemyPlayer = $enemyPlayer->handleShotAndGiveAnswer($x, $y);
+        $myPlayer->writeResultOfShooting($x, $y, $answerFromEnemyPlayer);
 
         if ($myPlayer->checkIfWon()) {
             $this->theWinner = self::I_AM_THE_WINNER;
             return;
         }
 
+        if ($answerFromEnemyPlayer === EnemyPlayer::YOU_MISSED) {
+            $this->turn = self::ENEMY_TURN;
+        } else {
+            $this->turn = self::MY_TURN;
+        }
+
         /** Enemy's shooting **/
         while ($this->turn === self::ENEMY_TURN) {
             [$x, $y] = $enemyPlayer->getCoordsForShooting();
 
-            $resultOfShooting = $enemyPlayer->handleShotAndGiveResult($x, $y);
-            $myPlayer->writeResultOfShooting($x, $y, $resultOfShooting);
-
-            if ($resultOfShooting === EnemyPlayer::MISSED) {
-                $this->turn = self::ENEMY_TURN;
-            } else {
-                $this->turn = self::MY_TURN;
-            }
+            $answerFromMyPlayer = $myPlayer->handleShotAndGiveAnswer($x, $y);
+            $enemyPlayer->writeResultOfShooting($x, $y, $answerFromMyPlayer);
 
             if ($enemyPlayer->checkIfWon()) {
                 $this->theWinner = self::ENEMY_IS_THE_WINNER;
                 return;
+            }
+
+            if ($answerFromMyPlayer === MyPlayer::YOU_MISSED) {
+                $this->turn = self::MY_TURN;
+            } else {
+                $this->turn = self::ENEMY_TURN;
             }
         }
     }

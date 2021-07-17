@@ -8,32 +8,26 @@ abstract class AbstractBoard
     public const WIDTH = 10;
     public const HEIGHT = 10;
 
-    protected array $cells = [];
+    protected array $squares = [];
 
 
     public function __construct()
     {
         for ($x = 0; $x < self::WIDTH; $x++) {
             for ($y = 0; $y < self::HEIGHT; $y++) {
-                $this->cells[$x][$y] = new Cell();
+                $this->squares[$x][$y] = new Square();
             }
         }
     }
 
 
-    public function getShipsToBeCreated(): array
+    public function getSquare(int $x, int $y): ?Square
     {
-        return $this->shipsToBeCreated;
-    }
-
-
-    public function getCell(int $x, int $y): ?Cell
-    {
-        if ($x < 0 || $y < 0 || $x >= self::WIDTH || $y >= self::HEIGHT ) {
+        if ($x < 0 || $y < 0 || $x >= self::WIDTH || $y >= self::HEIGHT) {
             return null;
         }
 
-        return $this->cells[$x][$y];
+        return $this->squares[$x][$y];
     }
 
 
@@ -47,20 +41,20 @@ abstract class AbstractBoard
             for ($y = 0; $y < self::WIDTH; $y++) {
                 $boardInHTML .= "<td ";
 
-                switch ($this->getCell($x, $y)->getState()) {
-                    case Cell::EMPTY:
-                        $boardInHTML .= "class='none'";
+                switch ($this->getSquare($x, $y)->getState()) {
+                    case Square::EMPTY:
+                        $boardInHTML .= "class='empty'";
                         break;
-                    case Cell::SHIP:
+                    case Square::SHIP:
                         $boardInHTML .= "class='ship'";
                         break;
-                    case Cell::SHIP_HIT:
+                    case Square::HIT_SHIP:
                         $boardInHTML .= "class='hit-ship'";
                         break;
-                    case Cell::SHIP_KILLED:
-                        $boardInHTML .= "class='dead-ship'";
+                    case Square::KILLED_SHIP:
+                        $boardInHTML .= "class='killed-ship'";
                         break;
-                    case Cell::PLAYER_MISSED:
+                    case Square::MISSED:
                         $boardInHTML .= "class='missed'";
                         break;
                 }

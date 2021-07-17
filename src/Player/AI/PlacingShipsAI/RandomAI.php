@@ -4,7 +4,7 @@ namespace SeaBattle\Player\AI\PlacingShipsAI;
 
 
 use SeaBattle\Board\AbstractBoard;
-use SeaBattle\Board\Cell;
+use SeaBattle\Board\Square;
 use SeaBattle\Ship\Ship;
 
 class RandomAI implements InterfacePlacingShipsAI
@@ -85,7 +85,7 @@ class RandomAI implements InterfacePlacingShipsAI
 
         for ($x = $checkedArea['startX']; $x <= $checkedArea['endX']; $x++) {
             for ($y = $checkedArea['startY']; $y <= $checkedArea['endY']; $y++) {
-                if ($this->cells[$x][$y]->getState() === Cell::THERE_IS_A_SHIP) {
+                if ($this->cells[$x][$y]->getState() === Square::THERE_IS_A_SHIP) {
                     return false;
                 }
             }
@@ -150,7 +150,7 @@ class RandomAI implements InterfacePlacingShipsAI
     {
         for ($x = $ship->getStartX(); $x <= $ship->getEndX(); $x++) {
             for ($y = $ship->getStartY(); $y <= $ship->getEndY(); $y++) {
-                $this->cells[$x][$y]->setState(Cell::THERE_IS_A_SHIP);
+                $this->cells[$x][$y]->setState(Square::THERE_IS_A_SHIP);
                 $this->cells[$x][$y]->setShipId($ship->getId());
             }
         }

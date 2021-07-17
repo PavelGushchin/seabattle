@@ -5,12 +5,12 @@ namespace SeaBattle\Board;
 use SeaBattle\Ship\Ship;
 
 
-class MainBoard extends AbstractBoard
+class ShipBoard extends AbstractBoard
 {
     protected array $ships = [];
 
 
-    public function getShip(int $shipId): ?Ship
+    public function getShipById(int $shipId): ?Ship
     {
         if ($shipId < 0 || $shipId >= count($this->ships)) {
             return null;
@@ -20,9 +20,9 @@ class MainBoard extends AbstractBoard
     }
 
 
-    public function addShip(int $size): void
+    public function addShip(int $size, int $direction, array $headCoords): void
     {
-        $this->ships[] = new Ship($size);
+        $this->ships[] = new Ship($size, $direction, $headCoords);
     }
 
 

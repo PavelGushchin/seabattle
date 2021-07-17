@@ -11,46 +11,29 @@ class Ship
     protected int $size;
     protected int $direction;
     protected array $parts = [];
+    protected array $squares = [];
     protected int $numberOfKilledParts = 0;
+    protected int $numberOfHits = 0;
 
 
-    public function __construct(int $size, int $direction, array $coordsOfShipHead)
+    public function __construct(int $size, int $direction, array $startCoords)
     {
-        [$x, $y] = $coordsOfShipHead;
+        [$x, $y] = $startCoords;
 
-        $this->parts[] = [
-            "x" => $x,
-            "y" => $y,
-            "isKilled" => false,
-        ];
-
-        if ($direction === self::HORIZONTAL) {
-            $dx =  1;
-            $dy = 0;
-        } else {
-            $dx =  0;
-            $dy = 1;
-        }
-
+        $this->parts[] = [$x, $y];
 
         for ($i = 1; $i < $size; $i++) {
+            if ($direction === self::HORIZONTAL) {
+                $x++;
+            } elseif ($direction === self::VERTICAL) {
+                $y++;
+            }
 
+            $this->parts[] = [$x, $y];
         }
 
         $this->size = $size;
         $this->direction = $direction;
-    }
-
-
-    public function checkForDeath(): bool
-    {
-        if ($this->size <= $this->hits) {
-            $this->isDead = true;
-
-            return true;
-        }
-
-        return false;
     }
 
 
@@ -60,29 +43,10 @@ class Ship
     }
 
 
-    public function setParts(array $parts): void
-    {
-        $this->parts = $parts;
-    }
-
-
-
-
     public function getDirection(): int
     {
         return $this->direction;
     }
-
-
-    public function setDirection(int $direction): self
-    {
-        $this->direction = $direction;
-
-        return $this;
-    }
-
-
-
 
 
     public function getSize(): int
@@ -91,22 +55,42 @@ class Ship
     }
 
 
-    public function getHits(): int
-    {
-        return $this->hits;
-    }
-
-
     public function addHit(): self
     {
-        $this->hits++;
+        $this->numberOfHits++;
+
+//        foreach ($this->parts as $part) {
+//            if ($part["x"] === $x && $part["y"] === $y) {
+//
+//            }
+//        }
+//
+//        $this->numberOfKilledParts++;
 
         return $this;
     }
 
 
-    public function isDead(): bool
+    public function checkIsKilled(): bool
     {
-        return $this->isDead;
+        return $this->numberOfHits === $this->size;
     }
+
+    /**
+     * @return array
+     */
+    public function getSquares(): array
+    {
+        return $this->squares;
+    }
+
+    /**
+     * @param array $squares
+     */
+    public function setSquares(array $squares): void
+    {
+        $this->squares = $squares;
+    }
+
+
 }
