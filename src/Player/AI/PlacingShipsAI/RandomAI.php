@@ -3,7 +3,7 @@
 namespace SeaBattle\Player\AI\PlacingShipsAI;
 
 
-use SeaBattle\Board\Board;
+use SeaBattle\Board\AbstractBoard;
 use SeaBattle\Board\Cell;
 use SeaBattle\Ship\Ship;
 
@@ -17,7 +17,7 @@ class RandomAI implements InterfacePlacingShipsAI
      * it places the ship on Board, but if can not - it chooses
      * another x and y coordinates.
      */
-    public function placeShipsOnBoard(Board $board)
+    public function placeShipsOnBoard(AbstractBoard $board)
     {
         foreach ($this->aliveShips as $ship) {
             do {

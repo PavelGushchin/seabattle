@@ -2,6 +2,7 @@
 
 namespace SeaBattle\Player;
 
+use SeaBattle\Board\AbstractBoard;
 use SeaBattle\Board\Cell;
 use SeaBattle\Board\MainBoard;
 use SeaBattle\Board\ShootingBoard;
@@ -10,69 +11,40 @@ use SeaBattle\Player\AI\PlacingShipsAI\RandomAI;
 use SeaBattle\Player\AI\ShootingAI\InterfaceShootingAI;
 
 
-class Player
+abstract class AbstractPlayer
 {
-    const HIT = "Answer to enemy that he hit my ship";
-    const KILLED = "Answer to enemy that he killed my ship";
-    const MISSED = "Answer to enemy that he missed";
+    public const HIT = "Answer to enemy that he hit my ship";
+    public const KILLED = "Answer to enemy that he killed my ship";
+    public const MISSED = "Answer to enemy that he missed";
 
-    protected MainBoard $mainBoard;
-    protected ShootingBoard $shootingBoard;
+    protected array $needToCreateTheseShips = [
+        ["size" => 4, "amount" => 1],
+        ["size" => 3, "amount" => 2],
+        ["size" => 2, "amount" => 3],
+        ["size" => 1, "amount" => 4],
+    ];
+
+    protected AbstractBoard $mainBoard;
+    protected AbstractBoard $shootingBoard;
     protected InterfacePlacingShipsAI $placingShipsAI;
-    protected ?InterfaceShootingAI $shootingAI;
 
 
-    public function __construct(?InterfaceShootingAI $shootingAI = null)
+    abstract public function getCoordsForShooting(): array;
+
+
+    public function __construct()
     {
         $this->mainBoard = new MainBoard();
         $this->shootingBoard = new ShootingBoard();
         $this->placingShipsAI = new RandomAI();
-        $this->shootingAI = $shootingAI;
-    }
-
-
-    public function getCoordsForShooting(): array
-    {
-        if ($this->shootingAI) {
-            /** AI Shooting by Enemy Player */
-            return $this->shootingAI->getCoordsForShooting($this->shootingBoard);
-        }
-
-        /** Manual shooting by My Player **/
-        $x = isset($_GET["x"]) ? intval($_GET["x"]) : null;
-        $y = isset($_GET["y"]) ? intval($_GET["y"]) : null;
-
-        if ($this->checkIfCoordsAreLegalForShooting($x, $y)) {
-            return [$x, $y];
-        }
-
-        return [null, null];
-    }
-
-
-    protected function checkIfCoordsAreLegalForShooting(?int $x, ?int $y): bool
-    {
-        $attackedBoardCell = $this->shootingBoard->getCell(intval($x), intval($y));
-
-        if (! $attackedBoardCell) {
-            return false;
-        }
-
-        if ($attackedBoardCell->getState() === Cell::EMPTY) {
-            return true;
-        }
-
-        return false;
     }
 
 
     public function createShipsOnMainBoard(): void
     {
-        $shipsToBeCreated = $this->mainBoard->getShipsToBeCreated();
-
-        foreach ($shipsToBeCreated as $ship) {
-            for ($i = 0; $i < $ship["amount"]; $i++) {
-                $this->mainBoard->addShip($ship["size"]);
+        foreach ($this->needToCreateTheseShips as $ships) {
+            for ($i = 0; $i < $ships["amount"]; $i++) {
+                $this->mainBoard->addShip($ships["size"]);
             }
         }
 
@@ -105,12 +77,6 @@ class Player
     }
 
 
-    public function setShootingAI(InterfaceShootingAI $shootingAI): void
-    {
-        $this->shootingAI = $shootingAI;
-    }
-
-
     public function printMainBoard(): string
     {
         return $this->mainBoard->print();
@@ -125,18 +91,17 @@ class Player
 
     public function handleShotAndGiveResult(int $x, int $y): int
     {
-        $shipWasHit = false;
-        $slot = $this->getSlot($x, $y);
+        $cell = $this->mainBoard->getCell($x, $y);
 
-        switch ($slot->getState()) {
-            case Slot::SLOT_IS_UNCOVERED:
-                $slot->setState(Slot::PLAYER_MISSED);
+        switch ($cell->getState()) {
+            case Cell::SLOT_IS_UNCOVERED:
+                $cell->setState(Cell::PLAYER_MISSED);
                 break;
-            case Slot::SLOT_IS_NONE:
-                $slot->setState(Slot::PLAYER_MISSED);
+            case Cell::SLOT_IS_NONE:
+                $cell->setState(Cell::PLAYER_MISSED);
                 break;
-            case Slot::THERE_IS_A_SHIP:
-                $shipId = $slot->getShipId();
+            case Cell::THERE_IS_A_SHIP:
+                $shipId = $cell->getShipId();
                 $ship = $this->aliveShips[$shipId];
 
                 $isShipDead = $ship->addHitAndCheckForDeath();
@@ -148,28 +113,32 @@ class Player
 
                     for ($i = $areaAroundShip['startX']; $i <= $areaAroundShip['endX']; $i++) {
                         for ($j = $areaAroundShip['startY']; $j <= $areaAroundShip['endY']; $j++) {
-                            if ($this->slots[$i][$j]->getState() === Slot::SLOT_IS_UNCOVERED) {
-                                $this->slots[$i][$j]->setState(Slot::SLOT_IS_NONE);
+                            if ($this->slots[$i][$j]->getState() === Cell::SLOT_IS_UNCOVERED) {
+                                $this->slots[$i][$j]->setState(Cell::SLOT_IS_NONE);
                             }
                         }
                     }
 
                     for ($i = $ship->getStartX(); $i <= $ship->getEndX(); $i++) {
                         for ($j = $ship->getStartY(); $j <= $ship->getEndY(); $j++) {
-                            $this->slots[$i][$j]->setState(Slot::SHIP_IS_DEAD);
+                            $this->slots[$i][$j]->setState(Cell::SHIP_IS_DEAD);
                         }
                     }
                 } else {
-                    $slot->setState(Slot::SHIP_WAS_HIT);
+                    $cell->setState(Cell::SHIP_WAS_HIT);
                 }
 
                 $shipWasHit = true;
                 break;
         }
 
-        $this->totalShots++;
-
         return $shipWasHit;
+    }
+
+
+    protected function checkIfCoordsAreLegalForShooting(?int $x, ?int $y): bool
+    {
+
     }
 
 }

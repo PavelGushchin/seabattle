@@ -2,10 +2,10 @@
 
 namespace SeaBattle\Player\AI\PlacingShipsAI;
 
-use SeaBattle\Board\Board;
+use SeaBattle\Board\AbstractBoard;
 
 
 interface InterfacePlacingShipsAI
 {
-    public function placeShipsOnBoard(Board $board);
+    public function placeShipsOnBoard(AbstractBoard $board);
 }

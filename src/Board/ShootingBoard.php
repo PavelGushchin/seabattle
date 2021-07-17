@@ -2,10 +2,10 @@
 
 namespace SeaBattle\Board;
 
-
 use SeaBattle\Ship\Ship;
 
-class ShootingBoard extends Board
+
+class ShootingBoard extends AbstractBoard
 {
     protected array $killedShips = [];
 

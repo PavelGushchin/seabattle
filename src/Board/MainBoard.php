@@ -5,7 +5,7 @@ namespace SeaBattle\Board;
 use SeaBattle\Ship\Ship;
 
 
-class MainBoard extends Board
+class MainBoard extends AbstractBoard
 {
     protected array $ships = [];
 
