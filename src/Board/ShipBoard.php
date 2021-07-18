@@ -20,9 +20,9 @@ class ShipBoard extends AbstractBoard
     }
 
 
-    public function addShip(int $size, int $direction, array $headCoords): void
+    public function addShip(int $size, int $direction, array $startCoords): void
     {
-        $this->ships[] = new Ship($size, $direction, $headCoords);
+        $this->ships[] = new Ship($size, $direction, $startCoords);
     }
 
 

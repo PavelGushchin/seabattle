@@ -2,10 +2,14 @@
 
 namespace SeaBattle\Player;
 
+use JetBrains\PhpStorm\Pure;
 use SeaBattle\Board\AbstractBoard;
 use SeaBattle\Board\Square;
 use SeaBattle\Board\ShipBoard;
 use SeaBattle\Board\ShootingBoard;
+use SeaBattle\Player\AI\PlacingShipsAI\InterfacePlacingShipsAI;
+use SeaBattle\Player\AI\PlacingShipsAI\RandomAI;
+use SeaBattle\Ship\Ship;
 
 
 abstract class AbstractPlayer
@@ -14,15 +18,10 @@ abstract class AbstractPlayer
     public const YOU_KILLED_MY_SHIP = "Answer to opponent that he killed my ship";
     public const YOU_MISSED = "Answer to opponent that he missed";
 
-    protected array $needToCreateTheseShips = [
-        ["size" => 4, "amount" => 1],
-        ["size" => 3, "amount" => 2],
-        ["size" => 2, "amount" => 3],
-        ["size" => 1, "amount" => 4],
-    ];
 
     protected AbstractBoard $shipBoard;
     protected AbstractBoard $shootingBoard;
+    protected InterfacePlacingShipsAI $placingShipsAI;
 
 
     abstract public function getCoordsForShooting(): array;
@@ -32,18 +31,13 @@ abstract class AbstractPlayer
     {
         $this->shipBoard = new ShipBoard();
         $this->shootingBoard = new ShootingBoard();
+        $this->placingShipsAI = new RandomAI();
     }
 
 
-    public function createShipsOnMainBoard(): void
+    public function setPlacingShipsAI(InterfacePlacingShipsAI $placingShipsAI): void
     {
-        foreach ($this->needToCreateTheseShips as $ships) {
-            for ($i = 0; $i < $ships["amount"]; $i++) {
-                $this->shipBoard->addShip($ships["size"]);
-            }
-        }
-
-        $this->placeShipsOnBoard($this->shipBoard);
+        $this->placingShipsAI = $placingShipsAI;
     }
 
 
@@ -119,5 +113,11 @@ abstract class AbstractPlayer
     {
         $ship = $board->getShipById($shipId);
 
+    }
+
+
+    public function createShips(): void
+    {
+        $this->placingShipsAI->createShipsOnBoard($this->shipBoard);
     }
 }

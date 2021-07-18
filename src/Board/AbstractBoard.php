@@ -10,12 +10,19 @@ abstract class AbstractBoard
 
     protected array $squares = [];
 
+    protected array $shipsToCreate = [
+        ["ship size" => 4, "amount" => 1],
+        ["ship size" => 3, "amount" => 2],
+        ["ship size" => 2, "amount" => 3],
+        ["ship size" => 1, "amount" => 4],
+    ];
+
 
     public function __construct()
     {
         for ($x = 0; $x < self::WIDTH; $x++) {
             for ($y = 0; $y < self::HEIGHT; $y++) {
-                $this->squares[$x][$y] = new Square();
+                $this->squares[$x][$y] = new Square($x, $y);
             }
         }
     }

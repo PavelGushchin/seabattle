@@ -2,90 +2,69 @@
 
 namespace SeaBattle\Player\AI\PlacingShipsAI;
 
-
 use SeaBattle\Board\AbstractBoard;
+use SeaBattle\Board\ShipBoard;
 use SeaBattle\Board\Square;
 use SeaBattle\Ship\Ship;
 
+
 class RandomAI implements InterfacePlacingShipsAI
 {
-    /**
-     * This method places ships on Board randomly.
-     *
-     * First, it choose random x and y coordinate for ship's head.
-     * Second, it checks if ship can be located there: if can -
-     * it places the ship on Board, but if can not - it chooses
-     * another x and y coordinates.
-     */
-    public function placeShipsOnBoard(AbstractBoard $board)
+    public function createShips(AbstractBoard $board): void
     {
-        foreach ($this->aliveShips as $ship) {
-            do {
-                $ship->setDirection(mt_rand(Ship::HORIZONTAL, Ship::VERTICAL));
+        foreach ($this->shipsToCreate as $ship) {
+            $shipSize = $ship["ship size"];
+            $amount = $ship["amount"];
 
-                $ship->setStartX(mt_rand(0, self::WIDTH - 1));
-
-                $ship->setStartY(mt_rand(0, self::HEIGHT - 1));
-
-                $isShipLocatedCorrectly = $this->isSizeOfShipIsNotVeryLong($ship)
-                    && $this->isSpaceAroundShipIsEmpty($ship);
-            } while (!$isShipLocatedCorrectly);
-
-            $this->placeShipOnBoard($ship);
+            for ($i = 0; $i < $amount; $i++) {
+                $this->createShip($shipSize);
+            }
         }
     }
 
 
-
-    /**
-     * Checks if ship can fit on Field with given size, direction and
-     * x and y coordinates of ship's head
-     *
-     * @param Ship $ship Checked ship
-     *
-     * @return bool
-     */
-    private function isSizeOfShipIsNotVeryLong($ship)
+    public function createShip(int $shipSize): void
     {
-        $startX = $ship->getStartX();
-        $startY = $ship->getStartY();
+        do {
+            $direction = rand(Ship::HORIZONTAL, Ship::VERTICAL);
+            $startCoords = [
+                rand(0, ShipBoard::WIDTH - 1),
+                rand(0, ShipBoard::HEIGHT - 1)
+            ];
 
-        switch ($ship->getDirection()) {
-            case Ship::HORIZONTAL:
-                $endX = $startX + $ship->getSize() - 1;
-                break;
-            case Ship::VERTICAL:
-                $endY = $startY + $ship->getSize() - 1;
-                break;
-            default:
-                throw new \Exception("Ship doesn't have a direction!");
-        }
+            $endCoords = Ship::calculateEndCoords($shipSize, $direction, $startCoords);
 
-        if ($endX >= self::WIDTH || $endY >= self::HEIGHT) {
-            return false;
-        }
+            $canShipBeCreated =
+                $this->ifShipDoesNotGoOffBoard($endCoords) &&
+                $this->ifAreaAroundShipIsEmpty($startCoords, $endCoords);
 
-        $ship->setEndX($endX);
-        $ship->setEndY($endY);
+        } while (! $canShipBeCreated);
 
-        return true;
+        $this->shipBoard->addShip($shipSize, $direction, $startCoords);
     }
 
-    /**
-     * Checks if cells around ship is empty so we can place
-     * the ship on Board
-     *
-     * @param Ship $ship Checked ship
-     *
-     * @return bool
-     */
-    private function isSpaceAroundShipIsEmpty($ship)
-    {
-        $checkedArea = $this->getAreaAroundShip($ship->getId());
 
-        for ($x = $checkedArea['startX']; $x <= $checkedArea['endX']; $x++) {
-            for ($y = $checkedArea['startY']; $y <= $checkedArea['endY']; $y++) {
-                if ($this->cells[$x][$y]->getState() === Square::THERE_IS_A_SHIP) {
+    protected function ifShipDoesNotGoOffBoard($endCoords): bool
+    {
+        [$shipEndX, $shipEndY] = $endCoords;
+
+        if ($shipEndX < ShipBoard::WIDTH && $shipEndY < ShipBoard::HEIGHT) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    protected function ifAreaAroundShipIsEmpty($startCoords, $endCoords): bool
+    {
+        $areaAroundShip = $this->getCoordsOfAreaAroundShip($startCoords, $endCoords);
+
+        [$areaStartX, $areaStartY, $areaEndX, $areaEndY] = $areaAroundShip;
+
+        for ($x = $areaStartX; $x <= $areaEndX; $x++) {
+            for ($y = $areaStartY; $y <= $areaEndY; $y++) {
+                if ($this->shipBoard[$x][$y]->getState() !== Square::EMPTY) {
                     return false;
                 }
             }
@@ -94,23 +73,16 @@ class RandomAI implements InterfacePlacingShipsAI
         return true;
     }
 
-    /**
-     * This method is just a helper for another method
-     * (@see Field::isSpaceAroundShipIsEmpty)
-     *
-     * It returns array which contains coordinates for starting and ending
-     * points of area that surrounds the ship
-     *
-     * @param int $shipId
-     *
-     * @return array
-     */
-    private function getAreaAroundShip($shipId)
-    {
-        $ship = $this->aliveShips[$shipId];
 
-        $areaStartX = $ship->getStartX() - 1;
-        $areaStartY = $ship->getStartY() - 1;
+    protected function getCoordsOfAreaAroundShip($startCoords, $endCoords): array
+    {
+        [$shipStartX, $shipStartY] = $startCoords;
+        [$shipEndX, $shipEndY] = $endCoords;
+
+        $areaStartX = $shipStartX - 1;
+        $areaStartY = $shipStartY - 1;
+        $areaEndX = $shipEndX + 1;
+        $areaEndY = $shipEndY + 1;
 
         if ($areaStartX < 0) {
             $areaStartX = 0;
@@ -120,40 +92,14 @@ class RandomAI implements InterfacePlacingShipsAI
             $areaStartY = 0;
         }
 
-
-        $areaEndX = $ship->getEndX() + 1;
-        $areaEndY = $ship->getEndY() + 1;
-
-        if ($areaEndX >= self::WIDTH) {
-            $areaEndX = self::WIDTH - 1;
+        if ($areaEndX >= ShipBoard::WIDTH) {
+            $areaEndX = ShipBoard::WIDTH - 1;
         }
 
-        if ($areaEndY >= self::HEIGHT) {
-            $areaEndY = self::HEIGHT - 1;
+        if ($areaEndY >= ShipBoard::HEIGHT) {
+            $areaEndY = ShipBoard::HEIGHT - 1;
         }
 
-        return [
-            'startX' => $areaStartX,
-            'startY' => $areaStartY,
-            'endX' => $areaEndX,
-            'endY' => $areaEndY,
-        ];
+        return [$areaStartX, $areaStartY, $areaEndX, $areaEndY];
     }
-
-    /**
-     * This method is called when ship passed all checks and therefore
-     * located correctly.
-     *
-     * @param Ship $ship Ship to place on map
-     */
-    private function placeShipOnBoard($ship)
-    {
-        for ($x = $ship->getStartX(); $x <= $ship->getEndX(); $x++) {
-            for ($y = $ship->getStartY(); $y <= $ship->getEndY(); $y++) {
-                $this->cells[$x][$y]->setState(Square::THERE_IS_A_SHIP);
-                $this->cells[$x][$y]->setShipId($ship->getId());
-            }
-        }
-    }
-
 }

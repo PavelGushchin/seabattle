@@ -2,7 +2,7 @@
 
 namespace SeaBattle\Player\AI\ShootingAI;
 
-use SeaBattle\Board\AbstractBoard;
+use SeaBattle\Board\ShootingBoard;
 
 
 interface InterfaceShootingAI
@@ -11,5 +11,5 @@ interface InterfaceShootingAI
      * The main goal of this method is to return an array
      * which contains coordinates for next shooting
      */
-    public function getCoordsForShooting(AbstractBoard $shootingBoard): array;
+    public function getCoordsForShooting(ShootingBoard $shootingBoard): array;
 }

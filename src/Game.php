@@ -5,6 +5,7 @@ namespace SeaBattle;
 use SeaBattle\Board\Square;
 use SeaBattle\Board\AbstractBoard;
 use SeaBattle\Player\AbstractPlayer;
+use SeaBattle\Player\AI\ShootingAI\VeryEasyAI;
 use SeaBattle\Player\MyPlayer;
 use SeaBattle\Player\EnemyPlayer;
 use SeaBattle\Player\AI\ShootingAI\MediumAI;
@@ -29,17 +30,17 @@ class Game
     public function __construct()
     {
         $this->myPlayer = new MyPlayer();
-        $this->enemyPlayer = new EnemyPlayer(new MediumAI());
+        $this->enemyPlayer = new EnemyPlayer(new VeryEasyAI());
     }
 
 
     public function startNewGame(): void
     {
         $this->myPlayer->clearBoards();
-        $this->myPlayer->createShipsOnMainBoard();
+        $this->myPlayer->createShips();
 
         $this->enemyPlayer->clearBoards();
-        $this->enemyPlayer->createShipsOnMainBoard();
+        $this->enemyPlayer->createShips();
 
         $this->theWinner = self::NO_WINNER;
         $this->turn = self::MY_TURN;

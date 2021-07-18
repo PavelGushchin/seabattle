@@ -37,6 +37,28 @@ class Ship
     }
 
 
+    /**
+     * @throws \Exception if direction of ship is unknown
+     */
+    public static function calculateEndCoords(int $size, int $direction, array $startCoords): array
+    {
+        [$startX, $startY] = $startCoords;
+
+        switch ($direction) {
+            case self::HORIZONTAL:
+                $endX = $startX + $size - 1;
+                break;
+            case self::VERTICAL:
+                $endY = $startY + $size - 1;
+                break;
+            default:
+                throw new \Exception("Unknown ship's direction!");
+        }
+
+        return [$endX, $endY];
+    }
+
+
     public function getParts(): array
     {
         return $this->parts;
