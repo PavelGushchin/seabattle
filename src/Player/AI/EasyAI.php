@@ -1,9 +1,6 @@
 <?php
 
-namespace SeaBattle\Player\AI\ShootingAI;
-
-use SeaBattle\Field\Field;
-use SeaBattle\Field\Slot;
+namespace SeaBattle\Player\AI;
 
 
 /**
@@ -12,7 +9,7 @@ use SeaBattle\Field\Slot;
  *
  * @author Pavel Gushchin <pavel_gushchin@mail.ru>
  */
-class EasyAI implements InterfaceShootingAI
+class EasyAI implements InterfaceAI
 {
     const SHOOT_HORIZONTALLY = 1;
     const SHOOT_VERTICALLY = 2;

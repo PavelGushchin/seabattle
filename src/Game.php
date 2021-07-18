@@ -2,13 +2,10 @@
 
 namespace SeaBattle;
 
-use SeaBattle\Board\Square;
-use SeaBattle\Board\AbstractBoard;
 use SeaBattle\Player\AbstractPlayer;
 use SeaBattle\Player\AI\ShootingAI\VeryEasyAI;
-use SeaBattle\Player\MyPlayer;
 use SeaBattle\Player\EnemyPlayer;
-use SeaBattle\Player\AI\ShootingAI\MediumAI;
+use SeaBattle\Player\MyPlayer;
 
 
 class Game
@@ -20,11 +17,11 @@ class Game
     public const MY_TURN = "My turn";
     public const ENEMY_TURN = "Enemy's turn";
 
-    protected AbstractPlayer $myPlayer;
-    protected AbstractPlayer $enemyPlayer;
-
     protected string $theWinner = self::NO_WINNER;
     protected string $turn = self::MY_TURN;
+
+    protected AbstractPlayer $myPlayer;
+    protected AbstractPlayer $enemyPlayer;
 
 
     public function __construct()
@@ -63,56 +60,38 @@ class Game
             return;
         }
 
-        $answerFromEnemyPlayer = $enemyPlayer->handleShotAndGiveAnswer($x, $y);
-        $myPlayer->writeResultOfShooting($x, $y, $answerFromEnemyPlayer);
+        $resultOfShooting = $enemyPlayer->handleShotAndGiveResult($x, $y);
+        $myPlayer->writeResultOfShooting($x, $y, $resultOfShooting);
 
-        if ($myPlayer->checkIfWon()) {
-            $this->theWinner = self::I_AM_THE_WINNER;
-            return;
-        }
-
-        if ($answerFromEnemyPlayer === EnemyPlayer::YOU_MISSED) {
+        if ($resultOfShooting === EnemyPlayer::YOU_MISSED) {
             $this->turn = self::ENEMY_TURN;
         } else {
             $this->turn = self::MY_TURN;
+        }
+
+        if ($myPlayer->hasWon()) {
+            $this->theWinner = self::I_AM_THE_WINNER;
+            return;
         }
 
         /** Enemy's shooting **/
         while ($this->turn === self::ENEMY_TURN) {
             [$x, $y] = $enemyPlayer->getCoordsForShooting();
 
-            $answerFromMyPlayer = $myPlayer->handleShotAndGiveAnswer($x, $y);
-            $enemyPlayer->writeResultOfShooting($x, $y, $answerFromMyPlayer);
+            $resultOfShooting = $myPlayer->handleShotAndGiveResult($x, $y);
+            $enemyPlayer->writeResultOfShooting($x, $y, $resultOfShooting);
 
-            if ($enemyPlayer->checkIfWon()) {
-                $this->theWinner = self::ENEMY_IS_THE_WINNER;
-                return;
-            }
-
-            if ($answerFromMyPlayer === MyPlayer::YOU_MISSED) {
+            if ($resultOfShooting === MyPlayer::YOU_MISSED) {
                 $this->turn = self::MY_TURN;
             } else {
                 $this->turn = self::ENEMY_TURN;
             }
+
+            if ($enemyPlayer->hasWon()) {
+                $this->theWinner = self::ENEMY_IS_THE_WINNER;
+                return;
+            }
         }
-    }
-
-
-    public function startAutobattle(): void
-    {
-
-    }
-
-
-    public function getMyPlayer(): AbstractPlayer
-    {
-        return $this->myPlayer;
-    }
-
-
-    public function getEnemyPlayer(): AbstractPlayer
-    {
-        return $this->enemyPlayer;
     }
 
 
@@ -125,5 +104,17 @@ class Game
     public function getTheWinner(): string
     {
         return $this->theWinner;
+    }
+
+
+    public function getMyPlayer(): AbstractPlayer
+    {
+        return $this->myPlayer;
+    }
+
+
+    public function getEnemyPlayer(): AbstractPlayer
+    {
+        return $this->enemyPlayer;
     }
 }

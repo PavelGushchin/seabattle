@@ -10,7 +10,7 @@ abstract class AbstractBoard
 
     protected array $squares = [];
 
-    protected array $shipsToCreate = [
+    protected array $shipsToBeCreated = [
         ["ship size" => 4, "amount" => 1],
         ["ship size" => 3, "amount" => 2],
         ["ship size" => 2, "amount" => 3],
@@ -40,40 +40,30 @@ abstract class AbstractBoard
 
     public function print(): string
     {
-        $boardInHTML = "<table>";
+        $board = "<table>";
 
-        for ($x = 0; $x < self::HEIGHT; $x++) {
-            $boardInHTML .= "<tr>";
+        for ($x = 0; $x < self::WIDTH; $x++) {
+            $board .= "<tr>";
 
-            for ($y = 0; $y < self::WIDTH; $y++) {
-                $boardInHTML .= "<td ";
+            for ($y = 0; $y < self::HEIGHT; $y++) {
+                $squareState = $this->getSquare($x, $y)->getState();
 
-                switch ($this->getSquare($x, $y)->getState()) {
-                    case Square::EMPTY:
-                        $boardInHTML .= "class='empty'";
-                        break;
-                    case Square::SHIP:
-                        $boardInHTML .= "class='ship'";
-                        break;
-                    case Square::HIT_SHIP:
-                        $boardInHTML .= "class='hit-ship'";
-                        break;
-                    case Square::KILLED_SHIP:
-                        $boardInHTML .= "class='killed-ship'";
-                        break;
-                    case Square::MISSED:
-                        $boardInHTML .= "class='missed'";
-                        break;
-                }
+                $cssClass = match ($squareState) {
+                    Square::EMPTY => "empty",
+                    Square::SHIP => "ship",
+                    Square::HIT_SHIP => "hit-ship",
+                    Square::KILLED_SHIP => "killed-ship",
+                    Square::MISSED => "missed",
+                };
 
-                $boardInHTML .= " data-x=$y data-y=$x></td>";
+                $board .= "<td class='$cssClass' data-x='$x' data-y='$y'></td>";
             }
 
-            $boardInHTML .= "</tr>";
+            $board .= "</tr>";
         }
 
-        $boardInHTML .= "</table>";
+        $board .= "</table>";
 
-        return $boardInHTML;
+        return $board;
     }
 }

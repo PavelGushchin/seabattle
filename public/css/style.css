@@ -4,10 +4,6 @@
     text-align: center;
 }
 
-h1, h2, h3 {
-    text-align: center;
-}
-
 table {
     border: 3px solid #25567B;
     background-color: #25567B;
@@ -19,22 +15,13 @@ th, td {
     height: 30px;
 }
 
-#mainBoardContainer, #shootingBoardContainer {
+#shipBoardContainer, #shootingBoardContainer {
     display: inline-block;
     margin: 0 15px;
 }
 
-#shootingBoard td.covered {
+#shootingBoard td.empty {
     cursor: pointer;
-}
-
-#myShips, #myShips h3 {
-    text-align: left;
-}
-
-#myShips {
-    width: 150px;
-    margin-left: 50px;
 }
 
 #new-game__button {
@@ -53,18 +40,12 @@ th, td {
     background-color: green;
 }
 
-.hit {
+.hit-ship {
     background-color: darkorange;
 }
 
-.dead {
+.killed-ship {
     background-color: red;
-}
-
-.empty {
-    background-image: url('../img/empty-slot.png');
-    background-position: center;
-    background-repeat: no-repeat;
 }
 
 #victory {

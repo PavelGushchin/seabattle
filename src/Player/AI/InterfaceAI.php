@@ -1,11 +1,11 @@
 <?php
 
-namespace SeaBattle\Player\AI\ShootingAI;
+namespace SeaBattle\Player\AI;
 
 use SeaBattle\Board\ShootingBoard;
 
 
-interface InterfaceShootingAI
+interface InterfaceAI
 {
     /**
      * The main goal of this method is to return an array

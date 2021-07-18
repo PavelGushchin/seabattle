@@ -1,8 +1,6 @@
 <?php
 
-namespace SeaBattle\Player\AI\ShootingAI;
-
-use SeaBattle\Player\AI\ShootingAI\InterfaceShootingAI;
+namespace SeaBattle\Player\AI;
 
 
 /**
@@ -11,7 +9,7 @@ use SeaBattle\Player\AI\ShootingAI\InterfaceShootingAI;
  *
  * @author Pavel Gushchin <pavel_gushchin@mail.ru>
  */
-class MediumAI implements InterfaceShootingAI
+class MediumAI implements InterfaceAI
 {
     const SHOOT_HORIZONTALLY = 1;
     const SHOOT_VERTICALLY = 2;

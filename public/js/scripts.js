@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 $(function() {
     $('#enemyField td').click(function() {

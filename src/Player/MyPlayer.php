@@ -13,9 +13,9 @@ class MyPlayer extends AbstractPlayer
             $x = (int)$_GET["x"];
             $y = (int)$_GET["y"];
 
-            $attackingSquare = $this->shootingBoard->getSquare($x, $y);
+            $attackedSquare = $this->shootingBoard->getSquare($x, $y);
 
-            if ($attackingSquare?->getState() === Square::EMPTY) {
+            if ($attackedSquare?->getState() === Square::EMPTY) {
                 return [$x, $y];
             }
         }

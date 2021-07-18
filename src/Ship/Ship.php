@@ -93,7 +93,7 @@ class Ship
     }
 
 
-    public function checkIsKilled(): bool
+    public function isKilled(): bool
     {
         return $this->numberOfHits === $this->size;
     }

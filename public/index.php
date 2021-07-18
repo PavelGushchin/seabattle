@@ -7,18 +7,14 @@ use SeaBattle\Game;
 
 session_start();
 
-if (isset($_SESSION['game'])) {
-    $game = unserialize($_SESSION['game']);
-} else {
+if (! isset($_SESSION["game"])) {
     $game = new Game();
+} else {
+    $game = unserialize($_SESSION["game"], ["allowed_classes" => Game::class]);
 }
 
 if (isset($_GET['start_new_game'])) {
     $game->startNewGame();
-}
-
-if (isset($_GET['autobattle'])) {
-    $game->startAutobattle();
 }
 
 $game->play();
@@ -30,7 +26,6 @@ $_SESSION['game'] = serialize($game);
 
 <!doctype html>
 <html lang="en">
-
     <head>
         <title>Sea Battle</title>
         <link rel="stylesheet" href="css/style.css">
@@ -40,12 +35,12 @@ $_SESSION['game'] = serialize($game);
         <div id="container">
             <h1>Sea Battle</h1>
     
-            <div id="mainBoardContainer">
+            <div id="shipBoardContainer">
                 <h2>My ships</h2>
     
-                <div id="mainBoard">
+                <div id="shipBoard">
                     <?php
-                        echo $game->getMyPlayer()->printMainBoard();
+                        echo $game->getMyPlayer()->printShipBoard();
                     ?>
                 </div>
             </div>

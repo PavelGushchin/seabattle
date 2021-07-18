@@ -1,12 +1,12 @@
 <?php
 
-namespace SeaBattle\Player\AI\ShootingAI;
+namespace SeaBattle\Player\AI;
 
 use SeaBattle\Board\ShootingBoard;
 use SeaBattle\Board\Square;
 
 
-class VeryEasyAI implements InterfaceShootingAI
+class VeryEasyAI implements InterfaceAI
 {
     public function getCoordsForShooting(ShootingBoard $shootingBoard): array
     {
@@ -17,14 +17,5 @@ class VeryEasyAI implements InterfaceShootingAI
         } while ($attackedSquare->getState() !== Square::EMPTY);
 
         return [$x, $y];
-    }
-
-
-    /**
-     * Returns name of the algorithm
-     */
-    public function __toString(): string
-    {
-        return "Random algorithm";
     }
 }
