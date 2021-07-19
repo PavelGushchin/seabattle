@@ -10,7 +10,7 @@ session_start();
 if (! isset($_SESSION["game"])) {
     $game = new Game();
 } else {
-    $game = unserialize($_SESSION["game"], ["allowed_classes" => Game::class]);
+    $game = unserialize($_SESSION["game"]);
 }
 
 if (isset($_GET['start_new_game'])) {
@@ -71,6 +71,7 @@ $_SESSION['game'] = serialize($game);
             </form>
         </div>
 
+        <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
         <script src="js/scripts.js"></script>
     </body>
 </html>

@@ -20,9 +20,21 @@ class ShipBoard extends AbstractBoard
     }
 
 
-    public function addShip(int $size, int $direction, array $startCoords): void
+    public function addShip(int $size, int $direction, array $startCoords, array $endCoords): void
     {
-        $this->ships[] = new Ship($size, $direction, $startCoords);
+        $newShip = new Ship($size, $direction, $startCoords);
+
+        [$startX, $startY] = $startCoords;
+        [$endX, $endY] = $endCoords;
+
+        for ($x = $startX; $x <= $endX; $x++) {
+            for ($y = $startY; $y <= $endY; $y++) {
+                $this->getSquare($x, $y)->setState(Square::SHIP);
+                $this->getSquare($x, $y)->setShip($newShip);
+            }
+        }
+
+        $this->ships[] = $newShip;
     }
 
 

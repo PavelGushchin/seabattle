@@ -1,14 +1,14 @@
 "use strict";
 
 $(function() {
-    $('#enemyField td').click(function() {
-        var uncovered = $(this).hasClass('uncovered');
+    $('#shootingBoard td').click(function() {
+        let empty = $(this).hasClass('empty');
 
-        if (uncovered) {
-            var x = $(this).data('x');
-            var y = $(this).data('y');
+        if (empty) {
+            let x = $(this).data('x');
+            let y = $(this).data('y');
 
-            var url = window.location.href.split('?')[0];
+            let url = window.location.href.split('?')[0];
             window.location = url + '?x=' + x + '&y=' + y;
         }
     });

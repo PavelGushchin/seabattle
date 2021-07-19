@@ -10,7 +10,7 @@ abstract class AbstractBoard
 
     protected array $squares = [];
 
-    protected array $shipsToBeCreated = [
+    protected array $shipsToCreate = [
         ["ship size" => 4, "amount" => 1],
         ["ship size" => 3, "amount" => 2],
         ["ship size" => 2, "amount" => 3],
@@ -66,4 +66,13 @@ abstract class AbstractBoard
 
         return $board;
     }
+
+    /**
+     * @return array|\int[][]
+     */
+    public function getShipsToCreate(): array
+    {
+        return $this->shipsToCreate;
+    }
+
 }

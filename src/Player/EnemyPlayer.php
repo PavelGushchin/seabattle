@@ -2,29 +2,29 @@
 
 namespace SeaBattle\Player;
 
-use SeaBattle\Player\AI\ShootingAI\InterfaceAI;
+use SeaBattle\Player\AI\InterfaceAI;
 
 
 class EnemyPlayer extends AbstractPlayer
 {
-    protected InterfaceAI $shootingAI;
+    protected InterfaceAI $AI;
 
 
-    public function __construct(InterfaceAI $shootingAI)
+    public function __construct(InterfaceAI $AI)
     {
         parent::__construct();
-        $this->shootingAI = $shootingAI;
+        $this->AI = $AI;
     }
 
 
     public function getCoordsForShooting(): array
     {
-        return $this->shootingAI->getCoordsForShooting($this->shootingBoard);
+        return $this->AI->getCoordsForShooting($this->shootingBoard);
     }
 
 
-    public function setShootingAI(InterfaceAI $shootingAI): void
+    public function setAI(InterfaceAI $AI): void
     {
-        $this->shootingAI = $shootingAI;
+        $this->AI = $AI;
     }
 }

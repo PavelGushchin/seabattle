@@ -12,7 +12,7 @@ class VeryEasyAI implements InterfaceAI
     {
         do {
             $x = rand(0, ShootingBoard::WIDTH - 1);
-            $y = rand(0, ShootingBoard::HEIGT - 1);
+            $y = rand(0, ShootingBoard::HEIGHT - 1);
             $attackedSquare = $shootingBoard->getSquare($x, $y);
         } while ($attackedSquare->getState() !== Square::EMPTY);
 

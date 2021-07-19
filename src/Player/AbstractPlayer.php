@@ -45,12 +45,18 @@ abstract class AbstractPlayer
                 $attackedShip->addHit();
 
                 if ($attackedShip->isKilled()) {
-                    $killedShipCoords = $attackedShip->getCoords();
-                    $this->markShipAsKilledOnBoard($this->shipBoard, $killedShipCoords);
+                    $this->markShipAsKilledOnBoard(
+                        $this->shipBoard,
+                        $attackedShip->getStartCoords(),
+                        $attackedShip->getEndCoords()
+                    );
 
                     return [
                         "answer_from_opponent" => self::YOU_KILLED_MY_SHIP,
-                        "killed_ship_coords" => $killedShipCoords
+                        "killed_ship_coords" => [
+                            $attackedShip->getStartCoords(),
+                            $attackedShip->getEndCoords()
+                        ]
                     ];
                 }
 
@@ -63,41 +69,63 @@ abstract class AbstractPlayer
 
     public function writeResultOfShooting(int $x, int $y, array $resultOfShooting): void
     {
-        $square = $this->shootingBoard->getSquare($x, $y);
+        $attackedSquare = $this->shootingBoard->getSquare($x, $y);
 
-        if ($square === null) {
+        if ($attackedSquare === null) {
             return;
         }
 
-        switch ($resultOfShooting["answer_from_opponent"]) {
+        $answerFromOpponent = $resultOfShooting["answer_from_opponent"];
+
+
+        switch ($answerFromOpponent) {
             case self::YOU_MISSED:
-                $square->setState(Square::MISSED);
+                $attackedSquare->setState(Square::MISSED);
                 break;
             case self::YOU_HIT_MY_SHIP:
-                $square->setState(Square::HIT_SHIP);
+                $attackedSquare->setState(Square::HIT_SHIP);
                 break;
             case self::YOU_KILLED_MY_SHIP:
-                $killedShipCoords = $resultOfShooting["killed_ship_coords"];
-                $this->markShipAsKilledOnBoard($this->shootingBoard, $killedShipCoords);
+                $this->shootingBoard->addKilledShip();
+
+                [$startCoords, $endCoords] = $resultOfShooting["killed_ship_coords"];
+                $this->markShipAsKilledOnBoard($this->shootingBoard, $startCoords, $endCoords);
                 break;
         }
     }
 
 
-    protected function markShipAsKilledOnBoard(AbstractBoard $board, array $ship): void
+    protected function markShipAsKilledOnBoard(AbstractBoard $board, $shipStartCoords, $shipEndCoords): void
     {
+        [$shipStartX, $shipStartY] = $shipStartCoords;
+        [$shipEndX, $shipEndY] = $shipEndCoords;
 
+        for ($x = $shipStartX; $x <= $shipEndX; $x++) {
+            for ($y = $shipStartY; $y <= $shipEndY; $y++) {
+                $board->getSquare($x, $y)->setState(Square::KILLED_SHIP);
+            }
+        }
+
+        $areaAroundShip = $this->getCoordsOfAreaAroundShip($shipStartCoords, $shipEndCoords);
+
+        [$areaStartX, $areaStartY, $areaEndX, $areaEndY] = $areaAroundShip;
+
+        for ($x = $areaStartX; $x <= $areaEndX; $x++) {
+            for ($y = $areaStartY; $y <= $areaEndY; $y++) {
+                $square = $board->getSquare($x, $y);
+                if ($square->getState() === Square::EMPTY) {
+                    $square->setState(Square::MISSED);
+                }
+            }
+        }
     }
 
 
-    public function createShips(AbstractBoard $board): void
+    public function createShips(): void
     {
-        foreach ($this->shipsToCreate as $ship) {
-            $shipSize = $ship["ship size"];
-            $amount = $ship["amount"];
-
-            for ($i = 0; $i < $amount; $i++) {
-                $this->createShip($shipSize);
+        foreach ($this->shipBoard->getShipsToCreate() as $ship) {
+            for ($i = 0; $i < $ship["amount"]; $i++) {
+                $this->createShip($ship["ship size"]);
             }
         }
     }
@@ -120,7 +148,7 @@ abstract class AbstractPlayer
 
         } while (! $canShipBeCreated);
 
-        $this->shipBoard->addShip($shipSize, $direction, $startCoords);
+        $this->shipBoard->addShip($shipSize, $direction, $startCoords, $endCoords);
     }
 
 
@@ -140,11 +168,11 @@ abstract class AbstractPlayer
     {
         $areaAroundShip = $this->getCoordsOfAreaAroundShip($startCoords, $endCoords);
 
-        [[$areaStartX, $areaStartY], [$areaEndX, $areaEndY]] = $areaAroundShip;
+        [$areaStartX, $areaStartY, $areaEndX, $areaEndY] = $areaAroundShip;
 
         for ($x = $areaStartX; $x <= $areaEndX; $x++) {
             for ($y = $areaStartY; $y <= $areaEndY; $y++) {
-                if ($this->shipBoard[$x][$y]->getState() !== Square::EMPTY) {
+                if ($this->shipBoard->getSquare($x, $y)->getState() !== Square::EMPTY) {
                     return false;
                 }
             }
@@ -154,10 +182,10 @@ abstract class AbstractPlayer
     }
 
 
-    protected function getCoordsOfAreaAroundShip($startCoords, $endCoords): array
+    protected function getCoordsOfAreaAroundShip($shipStartCoords, $shipEndCoords): array
     {
-        [$shipStartX, $shipStartY] = $startCoords;
-        [$shipEndX, $shipEndY] = $endCoords;
+        [$shipStartX, $shipStartY] = $shipStartCoords;
+        [$shipEndX, $shipEndY] = $shipEndCoords;
 
         $areaStartX = $shipStartX - 1;
         $areaStartY = $shipStartY - 1;
@@ -180,7 +208,7 @@ abstract class AbstractPlayer
             $areaEndY = ShipBoard::HEIGHT - 1;
         }
 
-        return [[$areaStartX, $areaStartY], [$areaEndX, $areaEndY]];
+        return [$areaStartX, $areaStartY, $areaEndX, $areaEndY];
     }
 
 
@@ -193,7 +221,9 @@ abstract class AbstractPlayer
 
     public function hasWon(): bool
     {
-        return $this->shootingBoard->getNumberOfKilledShips() === $this->shipBoard->getNumberOfAllShips();
+        $numberOfKilledShips = $this->shootingBoard->getNumberOfKilledShips();
+        $numberOfAllShips = $this->shipBoard->getNumberOfAllShips();
+        return $numberOfKilledShips === $numberOfAllShips;
     }
 
 

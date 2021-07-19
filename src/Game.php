@@ -3,7 +3,7 @@
 namespace SeaBattle;
 
 use SeaBattle\Player\AbstractPlayer;
-use SeaBattle\Player\AI\ShootingAI\VeryEasyAI;
+use SeaBattle\Player\AI\VeryEasyAI;
 use SeaBattle\Player\EnemyPlayer;
 use SeaBattle\Player\MyPlayer;
 
@@ -63,7 +63,9 @@ class Game
         $resultOfShooting = $enemyPlayer->handleShotAndGiveResult($x, $y);
         $myPlayer->writeResultOfShooting($x, $y, $resultOfShooting);
 
-        if ($resultOfShooting === EnemyPlayer::YOU_MISSED) {
+        $answerFromOpponent = $resultOfShooting["answer_from_opponent"];
+
+        if ($answerFromOpponent === EnemyPlayer::YOU_MISSED) {
             $this->turn = self::ENEMY_TURN;
         } else {
             $this->turn = self::MY_TURN;
@@ -81,7 +83,9 @@ class Game
             $resultOfShooting = $myPlayer->handleShotAndGiveResult($x, $y);
             $enemyPlayer->writeResultOfShooting($x, $y, $resultOfShooting);
 
-            if ($resultOfShooting === MyPlayer::YOU_MISSED) {
+            $answerFromOpponent = $resultOfShooting["answer_from_opponent"];
+
+            if ($answerFromOpponent === MyPlayer::YOU_MISSED) {
                 $this->turn = self::MY_TURN;
             } else {
                 $this->turn = self::ENEMY_TURN;

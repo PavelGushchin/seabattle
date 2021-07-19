@@ -47,8 +47,10 @@ class Ship
         switch ($direction) {
             case self::HORIZONTAL:
                 $endX = $startX + $size - 1;
+                $endY = $startY;
                 break;
             case self::VERTICAL:
+                $endX = $startX;
                 $endY = $startY + $size - 1;
                 break;
             default:
@@ -114,5 +116,15 @@ class Ship
         $this->squares = $squares;
     }
 
+    public function getStartCoords(): array
+    {
+        return $this->parts[0];
+    }
 
+    public function getEndCoords(): array
+    {
+        $lastElement = count($this->parts) - 1;
+
+        return $this->parts[$lastElement];
+    }
 }
