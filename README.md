@@ -1,10 +1,10 @@
-# Морской бой
+# Sea Battle
 
 ## History
-Originally I wrote this project in 2016 on PHP 5.6, but now I updated it using PHP 8.
+Originally I wrote this project in 2016 on PHP 5.6, but now I updated it to PHP 8.
 
 
-## Установка и запуск
+## How to run the project
 
 ```shell
 git clone https://github.com/PavelGushchin/seabattle.git
@@ -13,4 +13,4 @@ composer update
 cd public
 php -S localhost:8080
 ```
-Затем перейти на `http://localhost:8080` в браузере.
+After that, go to `http://localhost:8080` in your browser. 
