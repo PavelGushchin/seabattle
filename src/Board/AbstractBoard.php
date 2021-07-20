@@ -10,13 +10,6 @@ abstract class AbstractBoard
 
     protected array $squares = [];
 
-    protected array $shipsToCreate = [
-        ["ship size" => 4, "amount" => 1],
-        ["ship size" => 3, "amount" => 2],
-        ["ship size" => 2, "amount" => 3],
-        ["ship size" => 1, "amount" => 4],
-    ];
-
 
     public function __construct()
     {
@@ -42,10 +35,10 @@ abstract class AbstractBoard
     {
         $board = "<table>";
 
-        for ($x = 0; $x < self::WIDTH; $x++) {
+        for ($y = 0; $y < self::WIDTH; $y++) {
             $board .= "<tr>";
 
-            for ($y = 0; $y < self::HEIGHT; $y++) {
+            for ($x = 0; $x < self::HEIGHT; $x++) {
                 $squareState = $this->getSquare($x, $y)->getState();
 
                 $cssClass = match ($squareState) {
@@ -66,13 +59,4 @@ abstract class AbstractBoard
 
         return $board;
     }
-
-    /**
-     * @return array|\int[][]
-     */
-    public function getShipsToCreate(): array
-    {
-        return $this->shipsToCreate;
-    }
-
 }

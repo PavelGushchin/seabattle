@@ -8,39 +8,24 @@ use SeaBattle\Ship\Ship;
 class Square
 {
     public const EMPTY = 0;
-    public const SHIP = 1;
-    public const HIT_SHIP = 2;
-    public const KILLED_SHIP = 3;
-    public const MISSED = 4;
+    public const MISSED = 1;
+    public const SHIP = 2;
+    public const HIT_SHIP = 3;
+    public const KILLED_SHIP = 4;
 
-    protected int $x;
-    protected int $y;
     protected int $state = self::EMPTY;
+
+    /** Ship that is possibly located in this square */
     protected ?Ship $ship = null;
+
+    /** Coords on Board */
+    protected int $x, $y;
 
 
     public function __construct(int $x, int $y)
     {
         $this->x = $x;
         $this->y = $y;
-    }
-
-
-    public function getX(): int
-    {
-        return $this->x;
-    }
-
-
-    public function getY(): int
-    {
-        return $this->y;
-    }
-
-
-    public function getCoords(): array
-    {
-        return [$this->x, $this->y];
     }
 
 
@@ -65,5 +50,23 @@ class Square
     public function setShip(Ship $ship): void
     {
         $this->ship = $ship;
+    }
+
+
+    public function getX(): int
+    {
+        return $this->x;
+    }
+
+
+    public function getY(): int
+    {
+        return $this->y;
+    }
+
+
+    public function getCoords(): array
+    {
+        return [$this->x, $this->y];
     }
 }

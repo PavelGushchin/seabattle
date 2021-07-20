@@ -2,6 +2,8 @@
 
 namespace SeaBattle\Ship;
 
+use SeaBattle\Board\AbstractBoard;
+
 
 class Ship
 {
@@ -10,66 +12,73 @@ class Ship
 
     protected int $size;
     protected int $direction;
-    protected array $parts = [];
-    protected array $squares = [];
-    protected int $numberOfKilledParts = 0;
+
+    protected array $headCoords;
+    protected array $tailCoords;
+
+    /** It shows how many times the ship has been hit by our opponent. */
     protected int $numberOfHits = 0;
 
 
-    public function __construct(int $size, int $direction, array $startCoords)
+    public function __construct(int $size, int $direction, array $headCoords)
     {
-        [$x, $y] = $startCoords;
-
-        $this->parts[] = [$x, $y];
-
-        for ($i = 1; $i < $size; $i++) {
-            if ($direction === self::HORIZONTAL) {
-                $x++;
-            } elseif ($direction === self::VERTICAL) {
-                $y++;
-            }
-
-            $this->parts[] = [$x, $y];
-        }
-
         $this->size = $size;
         $this->direction = $direction;
-    }
+        $this->headCoords = $headCoords;
 
+        [$x, $y] = $headCoords;
 
-    /**
-     * @throws \Exception if direction of ship is unknown
-     */
-    public static function calculateEndCoords(int $size, int $direction, array $startCoords): array
-    {
-        [$startX, $startY] = $startCoords;
-
-        switch ($direction) {
-            case self::HORIZONTAL:
-                $endX = $startX + $size - 1;
-                $endY = $startY;
-                break;
-            case self::VERTICAL:
-                $endX = $startX;
-                $endY = $startY + $size - 1;
-                break;
-            default:
-                throw new \Exception("Unknown ship's direction!");
+        if ($direction === self::HORIZONTAL) {
+            $x += $size - 1;
+        } elseif ($direction === self::VERTICAL) {
+            $y += $size - 1;
         }
 
-        return [$endX, $endY];
+        $this->tailCoords = [$x, $y];
     }
 
 
-    public function getParts(): array
+    public function addHit(): void
     {
-        return $this->parts;
+        if ($this->numberOfHits < $this->size) {
+            $this->numberOfHits++;
+        }
     }
 
 
-    public function getDirection(): int
+    public function isKilled(): bool
     {
-        return $this->direction;
+        return $this->numberOfHits === $this->size;
+    }
+
+
+    public function getCoordsOfAreaAroundShip(): array
+    {
+        [$headShipX, $headShipY] = $this->headCoords;
+        [$tailShipX, $tailShipY] = $this->tailCoords;
+
+        $areaStartX = $headShipX - 1;
+        $areaStartY = $headShipY - 1;
+        $areaEndX = $tailShipX + 1;
+        $areaEndY = $tailShipY + 1;
+
+        if ($areaStartX < 0) {
+            $areaStartX = 0;
+        }
+
+        if ($areaStartY < 0) {
+            $areaStartY = 0;
+        }
+
+        if ($areaEndX > AbstractBoard::WIDTH - 1) {
+            $areaEndX = AbstractBoard::WIDTH - 1;
+        }
+
+        if ($areaEndY > AbstractBoard::HEIGHT - 1) {
+            $areaEndY = AbstractBoard::HEIGHT - 1;
+        }
+
+        return [$areaStartX, $areaStartY, $areaEndX, $areaEndY];
     }
 
 
@@ -79,52 +88,55 @@ class Ship
     }
 
 
-    public function addHit(): self
+    public function setSize(int $size): void
     {
-        $this->numberOfHits++;
-
-//        foreach ($this->parts as $part) {
-//            if ($part["x"] === $x && $part["y"] === $y) {
-//
-//            }
-//        }
-//
-//        $this->numberOfKilledParts++;
-
-        return $this;
+        $this->size = $size;
     }
 
 
-    public function isKilled(): bool
+    public function getDirection(): int
     {
-        return $this->numberOfHits === $this->size;
+        return $this->direction;
     }
 
-    /**
-     * @return array
-     */
-    public function getSquares(): array
+
+    public function setDirection(int $direction): void
     {
-        return $this->squares;
+        $this->direction = $direction;
     }
 
-    /**
-     * @param array $squares
-     */
-    public function setSquares(array $squares): void
+
+    public function getHeadCoords(): array
     {
-        $this->squares = $squares;
+        return $this->headCoords;
     }
 
-    public function getStartCoords(): array
+
+    public function setHeadCoords(array $headCoords): void
     {
-        return $this->parts[0];
+        $this->headCoords = $headCoords;
     }
 
-    public function getEndCoords(): array
+    public function getTailCoords(): array
     {
-        $lastElement = count($this->parts) - 1;
+        return $this->tailCoords;
+    }
 
-        return $this->parts[$lastElement];
+
+    public function setTailCoords(array $tailCoords): void
+    {
+        $this->tailCoords = $tailCoords;
+    }
+
+
+    public function getNumberOfHits(): int
+    {
+        return $this->numberOfHits;
+    }
+
+
+    public function setNumberOfHits(int $numberOfHits): void
+    {
+        $this->numberOfHits = $numberOfHits;
     }
 }

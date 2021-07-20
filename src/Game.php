@@ -14,11 +14,12 @@ class Game
     public const I_AM_THE_WINNER = "I am the winner";
     public const ENEMY_IS_THE_WINNER = "Enemy is the winner";
 
-    public const MY_TURN = "My turn";
-    public const ENEMY_TURN = "Enemy's turn";
+    public const I_AM_NEXT = "I am next";
+    public const ENEMY_IS_NEXT = "Enemy is next";
 
     protected string $theWinner = self::NO_WINNER;
-    protected string $turn = self::MY_TURN;
+    protected string $whoIsNext = self::I_AM_NEXT;
+    protected bool $gameIsRunning = false;
 
     protected AbstractPlayer $myPlayer;
     protected AbstractPlayer $enemyPlayer;
@@ -40,13 +41,14 @@ class Game
         $this->enemyPlayer->createShips();
 
         $this->theWinner = self::NO_WINNER;
-        $this->turn = self::MY_TURN;
+        $this->whoIsNext = self::I_AM_NEXT;
+        $this->gameIsRunning = true;
     }
 
 
     public function play(): void
     {
-        if ($this->isGameOver()) {
+        if (! $this->gameIsRunning) {
             return;
         }
 
@@ -63,51 +65,37 @@ class Game
         $resultOfShooting = $enemyPlayer->handleShotAndGiveResult($x, $y);
         $myPlayer->writeResultOfShooting($x, $y, $resultOfShooting);
 
-        $answerFromOpponent = $resultOfShooting["answer_from_opponent"];
-
-        if ($answerFromOpponent === EnemyPlayer::YOU_MISSED) {
-            $this->turn = self::ENEMY_TURN;
+        if ($resultOfShooting["answer"] === EnemyPlayer::YOU_MISSED) {
+            $this->whoIsNext = self::ENEMY_IS_NEXT;
         } else {
-            $this->turn = self::MY_TURN;
+            $this->whoIsNext = self::I_AM_NEXT;
         }
 
         if ($myPlayer->hasWon()) {
             $this->theWinner = self::I_AM_THE_WINNER;
+            $this->gameIsRunning = false;
             return;
         }
 
         /** Enemy's shooting **/
-        while ($this->turn === self::ENEMY_TURN) {
+        while ($this->whoIsNext === self::ENEMY_IS_NEXT) {
             [$x, $y] = $enemyPlayer->getCoordsForShooting();
 
             $resultOfShooting = $myPlayer->handleShotAndGiveResult($x, $y);
             $enemyPlayer->writeResultOfShooting($x, $y, $resultOfShooting);
 
-            $answerFromOpponent = $resultOfShooting["answer_from_opponent"];
-
-            if ($answerFromOpponent === MyPlayer::YOU_MISSED) {
-                $this->turn = self::MY_TURN;
+            if ($resultOfShooting["answer"] === MyPlayer::YOU_MISSED) {
+                $this->whoIsNext = self::I_AM_NEXT;
             } else {
-                $this->turn = self::ENEMY_TURN;
+                $this->whoIsNext = self::ENEMY_IS_NEXT;
             }
 
             if ($enemyPlayer->hasWon()) {
                 $this->theWinner = self::ENEMY_IS_THE_WINNER;
+                $this->gameIsRunning = false;
                 return;
             }
         }
-    }
-
-
-    public function isGameOver(): bool
-    {
-        return $this->theWinner !== self::NO_WINNER;
-    }
-
-
-    public function getTheWinner(): string
-    {
-        return $this->theWinner;
     }
 
 
@@ -120,5 +108,11 @@ class Game
     public function getEnemyPlayer(): AbstractPlayer
     {
         return $this->enemyPlayer;
+    }
+
+
+    public function getTheWinner(): string
+    {
+        return $this->theWinner;
     }
 }

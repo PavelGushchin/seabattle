@@ -13,4 +13,4 @@ composer update
 cd public
 php -S localhost:8080
 ```
-After that, go to `http://localhost:8080` in your browser. 
+After that, open `http://localhost:8080` in your browser. 

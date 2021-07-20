@@ -7,34 +7,31 @@ use SeaBattle\Ship\Ship;
 
 class ShipBoard extends AbstractBoard
 {
+    public const SHIPS_TO_CREATE = [
+        ["ship size" => 4, "amount" => 1],
+        ["ship size" => 3, "amount" => 2],
+        ["ship size" => 2, "amount" => 3],
+        ["ship size" => 1, "amount" => 4],
+    ];
+
     protected array $ships = [];
 
 
-    public function getShipById(int $shipId): ?Ship
+    public function addShip(Ship $ship): void
     {
-        if ($shipId < 0 || $shipId >= count($this->ships)) {
-            return null;
-        }
+        [$headX, $headY] = $ship->getHeadCoords();
+        [$tailX, $tailY] = $ship->getTailCoords();
 
-        return $this->ships[$shipId];
-    }
+        for ($x = $headX; $x <= $tailX; $x++) {
+            for ($y = $headY; $y <= $tailY; $y++) {
+                $shipSquare = $this->getSquare($x, $y);
 
-
-    public function addShip(int $size, int $direction, array $startCoords, array $endCoords): void
-    {
-        $newShip = new Ship($size, $direction, $startCoords);
-
-        [$startX, $startY] = $startCoords;
-        [$endX, $endY] = $endCoords;
-
-        for ($x = $startX; $x <= $endX; $x++) {
-            for ($y = $startY; $y <= $endY; $y++) {
-                $this->getSquare($x, $y)->setState(Square::SHIP);
-                $this->getSquare($x, $y)->setShip($newShip);
+                $shipSquare->setState(Square::SHIP);
+                $shipSquare->setShip($ship);
             }
         }
 
-        $this->ships[] = $newShip;
+        $this->ships[] = $ship;
     }
 
 
