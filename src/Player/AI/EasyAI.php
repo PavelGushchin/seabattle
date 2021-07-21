@@ -12,11 +12,11 @@ class EasyAI implements InterfaceAI
     public const VERTICAL = "Hit ship has vertical direction";
     public const UNKNOWN = "Hit ship has unknown direction";
 
-    protected array $coordsOfHitShip;
+    protected array $coordsOfHitShip = [];
     protected string $directionOfHitShip = self::UNKNOWN;
 
     protected ShootingBoard $shootingBoard;
-    protected array $previousShootingCoords;
+    protected array $previousShootingCoords = [];
 
 
     public function getCoordsForShooting(ShootingBoard $shootingBoard): array
@@ -40,6 +40,7 @@ class EasyAI implements InterfaceAI
         shuffle($allPossibleCoordsOfHitShip);
 
         $shootingCoords = array_pop($allPossibleCoordsOfHitShip);
+
         $this->previousShootingCoords = $shootingCoords;
 
         return $shootingCoords;
@@ -164,5 +165,13 @@ class EasyAI implements InterfaceAI
         } while (! $isSquareEmpty);
 
         return [$x, $y];
+    }
+
+
+    public function reset(): void
+    {
+        $this->directionOfHitShip = self::UNKNOWN;
+        $this->coordsOfHitShip = [];
+        $this->previousShootingCoords = [];
     }
 }

@@ -8,7 +8,7 @@ abstract class AbstractBoard
     public const WIDTH = 10;
     public const HEIGHT = 10;
 
-    protected array $squares = [];
+    protected array $squares;
 
 
     public function __construct()

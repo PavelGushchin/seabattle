@@ -170,6 +170,10 @@ abstract class AbstractPlayer
     {
         $this->shipBoard = new ShipBoard();
         $this->shootingBoard = new ShootingBoard();
+
+        if (isset($this->AI)) {
+            $this->AI->reset();
+        }
     }
 
 

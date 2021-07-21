@@ -19,4 +19,9 @@ class VeryEasyAI implements InterfaceAI
 
         return [$x, $y];
     }
+
+
+    public function reset(): void
+    {
+    }
 }

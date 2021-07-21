@@ -14,7 +14,7 @@ class ShipBoard extends AbstractBoard
         ["ship size" => 1, "amount" => 4],
     ];
 
-    protected array $ships = [];
+    protected array $ships;
 
 
     public function addShip(Ship $ship): void
