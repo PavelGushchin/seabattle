@@ -7,11 +7,11 @@ use SeaBattle\Ship\Ship;
 
 class Square
 {
-    public const EMPTY = 0;
-    public const MISSED = 1;
-    public const SHIP = 2;
-    public const HIT_SHIP = 3;
-    public const KILLED_SHIP = 4;
+    public const EMPTY = 1;
+    public const MISSED = 2;
+    public const SHIP = 3;
+    public const HIT_SHIP = 4;
+    public const KILLED_SHIP = 5;
 
     protected int $state = self::EMPTY;
 

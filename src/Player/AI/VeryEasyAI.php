@@ -13,8 +13,9 @@ class VeryEasyAI implements InterfaceAI
         do {
             $x = rand(0, ShootingBoard::WIDTH - 1);
             $y = rand(0, ShootingBoard::HEIGHT - 1);
-            $attackedSquare = $shootingBoard->getSquare($x, $y);
-        } while ($attackedSquare->getState() !== Square::EMPTY);
+            $square = $shootingBoard->getSquare($x, $y);
+            $isSquareEmpty = $square->getState() === Square::EMPTY;
+        } while (! $isSquareEmpty);
 
         return [$x, $y];
     }

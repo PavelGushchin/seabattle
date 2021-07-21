@@ -7,8 +7,8 @@ use SeaBattle\Board\AbstractBoard;
 
 class Ship
 {
-    public const HORIZONTAL = 0;
-    public const VERTICAL = 1;
+    public const HORIZONTAL = 1;
+    public const VERTICAL = 2;
 
     protected int $size;
     protected int $direction;
