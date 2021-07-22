@@ -15,8 +15,16 @@ class EasyAI implements InterfaceAI
     protected array $coordsOfHitShip = [];
     protected string $directionOfHitShip = self::UNKNOWN;
 
+    protected InterfaceAI $randomShooter;
     protected ShootingBoard $shootingBoard;
     protected array $previousShootingCoords = [];
+
+
+
+    public function __construct()
+    {
+        $this->randomShooter = new VeryEasyAI();
+    }
 
 
     public function getCoordsForShooting(ShootingBoard $shootingBoard): array
@@ -97,28 +105,28 @@ class EasyAI implements InterfaceAI
     {
         switch ($this->directionOfHitShip) {
             case self::HORIZONTAL:
-                return $this->getAllPossibleHorizontalCoords();
+                return $this->getAllPossibleHorizontalCoordsOfHitShip();
             case self::VERTICAL:
-                return $this->getAllPossibleVerticalCoords();
+                return $this->getAllPossibleVerticalCoordsOfHitShip();
         }
 
-        return $this->getAllPossibleBidirectionalCoords();
+        return $this->getAllPossibleBidirectionalCoordsOfHitShip();
     }
 
 
-    protected function getAllPossibleHorizontalCoords(): array
+    protected function getAllPossibleHorizontalCoordsOfHitShip(): array
     {
         $allCoords = [];
 
-        foreach ($this->coordsOfHitShip as [$x, $y]) {
-            $leftSquare = $this->shootingBoard->getSquare($x - 1, $y);
+        foreach ($this->coordsOfHitShip as [$hitShipX, $hitShipY]) {
+            $leftSquare = $this->shootingBoard->getSquare($hitShipX - 1, $hitShipY);
             if ($leftSquare?->getState() === Square::EMPTY) {
-                $allCoords[] = [$leftSquare->getX(), $leftSquare->getY()];
+                $allCoords[] = $leftSquare->getCoords();
             }
 
-            $rightSquare = $this->shootingBoard->getSquare($x + 1, $y);
+            $rightSquare = $this->shootingBoard->getSquare($hitShipX + 1, $hitShipY);
             if ($rightSquare?->getState() === Square::EMPTY) {
-                $allCoords[] = [$rightSquare->getX(), $rightSquare->getY()];
+                $allCoords[] = $rightSquare->getCoords();
             }
         }
 
@@ -126,19 +134,19 @@ class EasyAI implements InterfaceAI
     }
 
 
-    protected function getAllPossibleVerticalCoords(): array
+    protected function getAllPossibleVerticalCoordsOfHitShip(): array
     {
         $allCoords = [];
 
-        foreach ($this->coordsOfHitShip as [$x, $y]) {
-            $topSquare = $this->shootingBoard->getSquare($x, $y - 1);
+        foreach ($this->coordsOfHitShip as [$hitShipX, $hitShipY]) {
+            $topSquare = $this->shootingBoard->getSquare($hitShipX, $hitShipY - 1);
             if ($topSquare?->getState() === Square::EMPTY) {
-                $allCoords[] = [$topSquare->getX(), $topSquare->getY()];
+                $allCoords[] = $topSquare->getCoords();
             }
 
-            $rightSquare = $this->shootingBoard->getSquare($x, $y + 1);
-            if ($rightSquare?->getState() === Square::EMPTY) {
-                $allCoords[] = [$rightSquare->getX(), $rightSquare->getY()];
+            $bottomSquare = $this->shootingBoard->getSquare($hitShipX, $hitShipY + 1);
+            if ($bottomSquare?->getState() === Square::EMPTY) {
+                $allCoords[] = $bottomSquare->getCoords();
             }
         }
 
@@ -146,10 +154,10 @@ class EasyAI implements InterfaceAI
     }
 
 
-    protected function getAllPossibleBidirectionalCoords(): array
+    protected function getAllPossibleBidirectionalCoordsOfHitShip(): array
     {
-        $horizontalCoords = $this->getAllPossibleHorizontalCoords();
-        $verticalCoords = $this->getAllPossibleVerticalCoords();
+        $horizontalCoords = $this->getAllPossibleHorizontalCoordsOfHitShip();
+        $verticalCoords = $this->getAllPossibleVerticalCoordsOfHitShip();
 
         return array_merge($horizontalCoords, $verticalCoords);
     }
@@ -157,14 +165,7 @@ class EasyAI implements InterfaceAI
 
     protected function getRandomCoords(): array
     {
-        do {
-            $x = rand(0, ShootingBoard::WIDTH - 1);
-            $y = rand(0, ShootingBoard::HEIGHT - 1);
-            $square = $this->shootingBoard->getSquare($x, $y);
-            $isSquareEmpty = $square->getState() === Square::EMPTY;
-        } while (! $isSquareEmpty);
-
-        return [$x, $y];
+        return $this->randomShooter->getCoordsForShooting($this->shootingBoard);
     }
 
 
