@@ -57,6 +57,7 @@ abstract class AbstractPlayer
         } while (! $canShipBeCreated);
 
         $this->shipBoard->addShip($ship);
+        $this->shootingBoard->addShip($shipSize);
     }
 
 
@@ -137,7 +138,7 @@ abstract class AbstractPlayer
 
                 $killedShip = $resultOfShooting["killed_ship"];
 
-                $this->shootingBoard->addKilledShip($killedShip);
+                $this->shootingBoard->addKilledShip($killedShip->getSize());
                 $this->markShipAsKilledOnBoard($this->shootingBoard, $killedShip);
                 break;
         }

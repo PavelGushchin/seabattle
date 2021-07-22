@@ -2,444 +2,316 @@
 
 namespace SeaBattle\Player\AI;
 
+use SeaBattle\Board\ShootingBoard;
+use SeaBattle\Board\Square;
 
-/**
- * ShootingWithStrategyAI represents algorithm which shoots
- * with a good strategy (upper-intermediate level)
- *
- * @author Pavel Gushchin <pavel_gushchin@mail.ru>
- */
+
 class MediumAI implements InterfaceAI
 {
-    const SHOOT_HORIZONTALLY = 1;
-    const SHOOT_VERTICALLY = 2;
-    const SHOOT_BIDIRECTIONALLY = 3;
+    public const HORIZONTAL = "Hit ship has horizontal direction";
+    public const VERTICAL = "Hit ship has vertical direction";
+    public const UNKNOWN = "Hit ship has unknown direction";
 
-    /**
-     * @var array Array with coordinates of damaged ship's parts
-     */
-    private $partsOfdamagedShip = [];
+    protected array $coordsOfHitShip = [];
+    protected string $directionOfHitShip = self::UNKNOWN;
 
-    /**
-     * @var array Array with coordinates of all possible variants
-     *            for next shot
-     */
-    private $variantsForNextShot = [];
+    protected ShootingBoard $shootingBoard;
+    protected array $previousShootingCoords = [];
 
-    /**
-     * @var int Current shooting direction (one of
-     *          ShootingWithStrategyAI::SHOOT_BIDIRECTIONALLY or
-     *          ShootingWithStrategyAI::SHOOT_HORIZONTALLY or
-     *          ShootingWithStrategyAI::SHOOT_BIDIRECTIONALLY)
-     */
-    private $shootingDirection = self::SHOOT_BIDIRECTIONALLY;
-
-    /**
-     * Each slot has its own value for shooting.
-     * First of all we are shooting to slots with the highest values
-     *
-     * @var array Array with values for slots
-     */
-    private $valuesForSlots;
+    protected array $valuesForSquares = [];
 
 
-    /**
-     * Returns name of the algorithm
-     *
-     * @return string
-     */
-    public function __toString()
+    public function getCoordsForShooting(ShootingBoard $shootingBoard): array
     {
-        return 'Strategy algorithm';
-    }
+        $this->shootingBoard = $shootingBoard;
 
-    /**
-     * Main method of the class.
-     *
-     * It calculates coordinates for next shot
-     * and returns them as array:
-     *  [
-     *      'x' => $x,
-     *      'y' => $y,
-     *  ]
-     *
-     * @param array      $slots Array with slots
-     * @param array|null $ships Array with ships
-     *
-     * @return array Array of shot coordinates
-     */
-    public function getCoordsForShooting(AbstractBoard $shootingBoard): array
-    {
-        $this->variantsForNextShot = [];
-        $this->setValuesForSlots($slots, $ships);
+        $this->writeResultOfPreviousShooting();
 
+        $this->setValuesForSquares();
 
-        if (empty($this->partsOfdamagedShip)) {
-            $this->calculateAllVariantsForRandomShot($slots);
+        if (empty($this->coordsOfHitShip)) {
+            $allPossibleCoords = $this->getAllPossibleCoordsForRandomShooting();
         } else {
-            $this->calculateAllVariantsForSmartShot($slots);
+            $allPossibleCoords = $this->getAllPossibleCoordsOfHitShip();
         }
 
-        shuffle($this->variantsForNextShot);
+        shuffle($allPossibleCoords);
+        ksort($allPossibleCoords);
 
-        usort($this->variantsForNextShot, function ($a, $b) {
-            return $b['value'] - $a['value'];
-        });
+        $shootingCoordsWithValue = array_pop($allPossibleCoords);
+        $shootingCoords = array_pop($shootingCoordsWithValue);
 
-        $coords = array_shift($this->variantsForNextShot);
+        $this->previousShootingCoords = $shootingCoords;
 
-        $x = $coords['x'];
-        $y = $coords['y'];
+        return $shootingCoords;
+    }
 
-        $slotState = !is_null($slots[$x][$y])
-            ? $slots[$x][$y]->getState()
-            : false;
 
-        if ($slotState === Slot::THERE_IS_A_SHIP) {
-            $shipId = $slots[$x][$y]->getShipId();
-            $ship = $ships[$shipId];
+    /**
+     *  When we shot previously, we only picked coords [x, y] for that shot,
+     *  but we didn't know, what result would be.
+     *  Now we know the result: either "hit", or "killed" or "missed".
+     *  So our AI has to synchronize with that result
+     */
+    protected function writeResultOfPreviousShooting(): void
+    {
+        if (empty($this->previousShootingCoords)) {
+            return;
+        }
 
-            $isShipGoingToDie = $ship->getSize() === $ship->getHits() + 1;
+        [$previousX, $previousY] = $this->previousShootingCoords;
 
-            if ($isShipGoingToDie) {
-                $this->partsOfdamagedShip = [];
-                $this->shootingDirection = self::SHOOT_BIDIRECTIONALLY;
-            } else {
-                $this->partsOfdamagedShip[] = [
-                    'x' => $x,
-                    'y' => $y,
-                ];
+        $currentStateOfSquare = $this->shootingBoard->getSquare($previousX, $previousY)->getState();
 
-                if (count($this->partsOfdamagedShip) === 2) {
-                    $this->defineShootingDirection();
+        switch ($currentStateOfSquare) {
+            case Square::HIT_SHIP:
+                $this->coordsOfHitShip[] = $this->previousShootingCoords;
+                if (count($this->coordsOfHitShip) === 2) {
+                    $this->directionOfHitShip = $this->defineDirectionOfHitShip();
                 }
-            }
-        }
-
-        return $coords;
-    }
-
-    /**
-     * When ship is hit for the first time we do not know what
-     * direction it has. And first of all we have to determine
-     * that direction and shoot only at that direction until
-     * ship will be killed
-     */
-    private function defineShootingDirection()
-    {
-        $firstPart = $this->partsOfdamagedShip[0];
-        $secondPart = $this->partsOfdamagedShip[1];
-
-        if ($firstPart['x'] === $secondPart['x']) {
-            $this->shootingDirection = self::SHOOT_VERTICALLY;
-        } else {
-            $this->shootingDirection = self::SHOOT_HORIZONTALLY;
+                break;
+            case Square::KILLED_SHIP:
+                $this->coordsOfHitShip = [];
+                $this->directionOfHitShip = self::UNKNOWN;
+                break;
         }
     }
 
-    /**
-     * When we do not have any wounded ships we pick variant for next
-     * shot randomly
-     *
-     * @param array $slots Array with slots
-     */
-    private function calculateAllVariantsForRandomShot($slots)
-    {
-        for ($i = 0; $i < Field::WIDTH; $i++) {
-            for ($j = 0; $j < Field::HEIGT; $j++) {
-                $slotState = $slots[$i][$j]->getState();
 
-                if ($slotState === Slot::SLOT_IS_UNCOVERED ||
-                    $slotState === Slot::THERE_IS_A_SHIP) {
-                    $this->variantsForNextShot[] = [
-                        'x' => $i,
-                        'y' => $j,
-                        'value' => $this->valuesForSlots[$i][$j],
-                    ];
-                }
-            }
+    protected function defineDirectionOfHitShip(): string
+    {
+        [$firstPartOfHitShip, $secondPartOfHitShip] = $this->coordsOfHitShip;
+
+        [$x1, $y1] = $firstPartOfHitShip;
+        [$x2, $y2] = $secondPartOfHitShip;
+
+        if ($x1 !== $x2) {
+            return self::HORIZONTAL;
         }
+
+        return self::VERTICAL;
     }
 
-    /**
-     * When we do have a wounded ship we have to shoot smartly
-     * until we kill it
-     *
-     * @param array $slots Array with slots
-     */
-    private function calculateAllVariantsForSmartShot($slots)
+
+    protected function setValuesForSquares(): void
     {
-        foreach ($this->partsOfdamagedShip as $shipPart) {
-            switch ($this->shootingDirection) {
-                case self::SHOOT_HORIZONTALLY:
-                    $this->addNewVariantsForHorizontalShooting($slots, $shipPart);
-                    break;
-                case self::SHOOT_VERTICALLY:
-                    $this->addNewVariantsForVerticalShooting($slots, $shipPart);
-                    break;
-                case self::SHOOT_BIDIRECTIONALLY:
-                    $this->addNewVariantsForHorizontalShooting($slots, $shipPart);
-                    $this->addNewVariantsForVerticalShooting($slots, $shipPart);
-                    break;
-            }
-        }
-    }
+        $this->valuesForSquares = [];
 
-    /**
-     * It adds all possible variants for shooting in horizontal direction
-     *
-     * @param array $slots    Array with slots
-     * @param array $shipPart Array with coordinates of ship's part
-     */
-    private function addNewVariantsForHorizontalShooting($slots, $shipPart)
-    {
-        $leftSlotX = $shipPart['x'] - 1;
-        $leftSlotY = $shipPart['y'];
+        for ($i = 0; $i < ShootingBoard::WIDTH; $i++) {
+            for ($j = 0; $j < ShootingBoard::HEIGHT; $j++) {
+                $this->valuesForSquares[$i][$j] = 0;
 
-        if ($leftSlotX >= 0) {
-            $leftSlotState = $slots[$leftSlotX][$leftSlotY]->getState();
-
-            if ($leftSlotState === Slot::SLOT_IS_UNCOVERED ||
-                $leftSlotState === Slot::THERE_IS_A_SHIP) {
-                $this->variantsForNextShot[] = [
-                    'x' => $leftSlotX,
-                    'y' => $leftSlotY,
-                    'value' => $this->valuesForSlots[$leftSlotX][$leftSlotY],
-                ];
-            }
-        }
-
-        $rightSlotX = $shipPart['x'] + 1;
-        $rightSlotY = $shipPart['y'];
-
-        if ($rightSlotX < Field::WIDTH) {
-            $rightSlotState = $slots[$rightSlotX][$rightSlotY]->getState();
-
-            if ($rightSlotState === Slot::SLOT_IS_UNCOVERED ||
-                $rightSlotState === Slot::THERE_IS_A_SHIP) {
-                $this->variantsForNextShot[] = [
-                    'x' => $rightSlotX,
-                    'y' => $rightSlotY,
-                    'value' => $this->valuesForSlots[$rightSlotX][$rightSlotY],
-                ];
-            }
-        }
-    }
-
-    /**
-     * It adds all possible variants for shooting in vertical direction
-     *
-     * @param array $slots    Array with slots
-     * @param array $shipPart Array with coordinates of ship's part
-     */
-    private function addNewVariantsForVerticalShooting($slots, $shipPart)
-    {
-        $topSlotX = $shipPart['x'];
-        $topSlotY = $shipPart['y'] - 1;
-
-        if ($topSlotY >= 0) {
-            $topSlotState = $slots[$topSlotX][$topSlotY]->getState();
-
-            if ($topSlotState === Slot::SLOT_IS_UNCOVERED ||
-                $topSlotState === Slot::THERE_IS_A_SHIP) {
-                $this->variantsForNextShot[] = [
-                    'x' => $topSlotX,
-                    'y' => $topSlotY,
-                    'value' => $this->valuesForSlots[$topSlotX][$topSlotY],
-                ];
-            }
-        }
-
-        $bottomSlotX = $shipPart['x'];
-        $bottomSlotY = $shipPart['y'] + 1;
-
-        if ($bottomSlotY < Field::HEIGT) {
-            $bottomSlotState = $slots[$bottomSlotX][$bottomSlotY]->getState();
-
-            if ($bottomSlotState === Slot::SLOT_IS_UNCOVERED ||
-                $bottomSlotState === Slot::THERE_IS_A_SHIP) {
-                $this->variantsForNextShot[] = [
-                    'x' => $bottomSlotX,
-                    'y' => $bottomSlotY,
-                    'value' => $this->valuesForSlots[$bottomSlotX][$bottomSlotY],
-                ];
-            }
-        }
-    }
-
-    /**
-     * This method evaluates all slots.
-     * The higher slot's value is, the sooner it will be shot
-     *
-     * @param array $slots Array with slots
-     * @param array $ships Array with ships
-     */
-    private function setValuesForSlots($slots, $ships)
-    {
-        $this->valuesForSlots = [];
-
-        for ($i = 0; $i < Field::WIDTH; $i++) {
-            for ($j = 0; $j < Field::HEIGT; $j++) {
-                $this->valuesForSlots[$i][$j] = 0;
-
-                if ($slots[$i][$j]->getState() !== Slot::SLOT_IS_UNCOVERED &&
-                    $slots[$i][$j]->getState() !== Slot::THERE_IS_A_SHIP) {
+                $squareState = $this->shootingBoard->getSquare($i, $j)->getState();
+                if ($squareState !== Square::EMPTY) {
                     continue;
                 }
 
-                $leftUncoveredSlots = $this->getAmountOfLeftUncoveredSlots($slots, $i, $j);
-                $rightUncoveredSlots = $this->getAmountOfRightUncoveredSlots($slots, $i, $j);
-                $topUncoveredSlots = $this->getAmountOfTopUncoveredSlots($slots, $i, $j);
-                $bottomUncoveredSlots = $this->getAmountOfBottomUncoveredSlots($slots, $i, $j);
+                $leftNotMissedSquares = $this->getAmountOfLeftNotMissedSquares($i, $j);
+                $rightNotMissedSquares = $this->getAmountOfRightNotMissedSquares($i, $j);
+                $topNotMissedSquares = $this->getAmountOfTopNotMissedSquares($i, $j);
+                $bottomNotMissedSquares = $this->getAmountOfBottomNotMissedSquares($i, $j);
 
-                $horizontalUncoveredSlots = $leftUncoveredSlots + $rightUncoveredSlots + 1;
-                $verticalUncoveredSlots = $topUncoveredSlots + $bottomUncoveredSlots + 1;
+                $horizontalNotMissedSquares = $leftNotMissedSquares + $rightNotMissedSquares + 1;
+                $verticalNotMissedSquares = $topNotMissedSquares + $bottomNotMissedSquares + 1;
 
-                foreach ($ships as $ship) {
-                    if (!$ship->isDead()) {
-                        if ($ship->getSize() <= $horizontalUncoveredSlots) {
-                            $this->valuesForSlots[$i][$j] += $ship->getSize();
-                        }
+                foreach ($this->shootingBoard->getAliveShips() as $shipSize) {
+                    if ($shipSize <= $horizontalNotMissedSquares) {
+                        $this->valuesForSquares[$i][$j] += $shipSize;
+                    }
 
-                        if ($ship->getSize() <= $verticalUncoveredSlots) {
-                            $this->valuesForSlots[$i][$j] += $ship->getSize();
-                        }
+                    if ($shipSize <= $verticalNotMissedSquares) {
+                        $this->valuesForSquares[$i][$j] += $shipSize;
                     }
                 }
 
-
-                if ($leftUncoveredSlots > 0) {
-                    $this->valuesForSlots[$i][$j]++;
+                if ($leftNotMissedSquares > 0) {
+                    $this->valuesForSquares[$i][$j]++;
                 }
 
-                if ($rightUncoveredSlots > 0) {
-                    $this->valuesForSlots[$i][$j]++;
+                if ($rightNotMissedSquares > 0) {
+                    $this->valuesForSquares[$i][$j]++;
                 }
 
-                if ($topUncoveredSlots > 0) {
-                    $this->valuesForSlots[$i][$j]++;
+                if ($topNotMissedSquares > 0) {
+                    $this->valuesForSquares[$i][$j]++;
                 }
 
-                if ($bottomUncoveredSlots > 0) {
-                    $this->valuesForSlots[$i][$j]++;
+                if ($bottomNotMissedSquares > 0) {
+                    $this->valuesForSquares[$i][$j]++;
                 }
             }
         }
     }
 
-    /**
-     * Returns number of uncovered slots to the left
-     * from our checked slot
-     *
-     * @param array $slots Array with slots
-     * @param int   $x     X-coordinate of checked slot
-     * @param int   $y     Y-coordinate of checked slot
-     *
-     * @return int
-     */
-    private function getAmountOfLeftUncoveredSlots($slots, $x, $y)
+
+    protected function getAllPossibleCoordsOfHitShip(): array
+    {
+        $result = [];
+
+        $coordsOfAllPossibleSquares = match ($this->directionOfHitShip) {
+            self::HORIZONTAL => $this->getAllPossibleHorizontalCoordsOfHitShip(),
+            self::VERTICAL => $this->getAllPossibleVerticalCoordsOfHitShip(),
+            self::UNKNOWN => $this->getAllPossibleBidirectionalCoordsOfHitShip(),
+        };
+
+        foreach ($coordsOfAllPossibleSquares as $squareCoords) {
+            [$x, $y] = $squareCoords;
+            $squareValue = $this->valuesForSquares[$x][$y];
+
+            $result[] = [$squareValue => $squareCoords];
+        }
+
+        return $result;
+    }
+
+
+    protected function getAllPossibleHorizontalCoordsOfHitShip(): array
+    {
+        $allCoords = [];
+
+        foreach ($this->coordsOfHitShip as [$hitShipX, $hitShipY]) {
+            $leftSquare = $this->shootingBoard->getSquare($hitShipX - 1, $hitShipY);
+            if ($leftSquare?->getState() === Square::EMPTY) {
+                $allCoords[] = $leftSquare->getCoords();
+            }
+
+            $rightSquare = $this->shootingBoard->getSquare($hitShipX + 1, $hitShipY);
+            if ($rightSquare?->getState() === Square::EMPTY) {
+                $allCoords[] = $rightSquare->getCoords();
+            }
+        }
+
+        return $allCoords;
+    }
+
+
+    protected function getAllPossibleVerticalCoordsOfHitShip(): array
+    {
+        $allCoords = [];
+
+        foreach ($this->coordsOfHitShip as [$x, $y]) {
+            $topSquare = $this->shootingBoard->getSquare($x, $y - 1);
+            if ($topSquare?->getState() === Square::EMPTY) {
+                $allCoords[] = $topSquare->getCoords();
+            }
+
+            $bottomSquare = $this->shootingBoard->getSquare($x, $y + 1);
+            if ($bottomSquare?->getState() === Square::EMPTY) {
+                $allCoords[] = $bottomSquare->getCoords();
+            }
+        }
+
+        return $allCoords;
+    }
+
+
+    protected function getAllPossibleBidirectionalCoordsOfHitShip(): array
+    {
+        $horizontalCoords = $this->getAllPossibleHorizontalCoordsOfHitShip();
+        $verticalCoords = $this->getAllPossibleVerticalCoordsOfHitShip();
+
+        return array_merge($horizontalCoords, $verticalCoords);
+    }
+
+
+    protected function getAmountOfLeftNotMissedSquares(int $x, int $y): int
     {
         $amount = 0;
 
         for ($i = $x - 1; $i >= 0; $i--) {
-            $slotState = $slots[$i][$y]->getState();
+            $squareState = $this->shootingBoard->getSquare($i, $y)->getState();
 
-            if ($slotState === Slot::SLOT_IS_UNCOVERED ||
-                $slotState === Slot::THERE_IS_A_SHIP ||
-                $slotState === Slot::SHIP_WAS_HIT) {
-                $amount++;
-            } else {
+            if ($squareState === Square::MISSED) {
                 break;
             }
+
+            $amount++;
         }
 
         return $amount;
     }
 
-    /**
-     * Returns number of uncovered slots to the right
-     * from our checked slot
-     *
-     * @param array $slots Array with slots
-     * @param int   $x     X-coordinate of checked slot
-     * @param int   $y     Y-coordinate of checked slot
-     *
-     * @return int
-     */
-    private function getAmountOfRightUncoveredSlots($slots, $x, $y)
+
+    protected function getAmountOfRightNotMissedSquares(int $x, int $y): int
     {
         $amount = 0;
 
-        for ($i = $x + 1; $i < Field::WIDTH; $i++) {
-            $slotState = $slots[$i][$y]->getState();
+        for ($i = $x + 1; $i < ShootingBoard::WIDTH; $i++) {
+            $squareState = $this->shootingBoard->getSquare($i, $y)->getState();
 
-            if ($slotState === Slot::SLOT_IS_UNCOVERED ||
-                $slotState === Slot::THERE_IS_A_SHIP ||
-                $slotState === Slot::SHIP_WAS_HIT) {
-                $amount++;
-            } else {
+            if ($squareState === Square::MISSED) {
                 break;
             }
+
+            $amount++;
         }
 
         return $amount;
     }
 
-    /**
-     * Returns number of uncovered slots from above
-     * of our checked slot
-     *
-     * @param array $slots Array with slots
-     * @param int   $x     X-coordinate of checked slot
-     * @param int   $y     Y-coordinate of checked slot
-     *
-     * @return int
-     */
-    private function getAmountOfTopUncoveredSlots($slots, $x, $y)
+
+    protected function getAmountOfTopNotMissedSquares(int $x, int $y): int
     {
         $amount = 0;
 
         for ($j = $y - 1; $j >= 0; $j--) {
-            $slotState = $slots[$x][$j]->getState();
+            $squareState = $this->shootingBoard->getSquare($x, $j)->getState();
 
-            if ($slotState === Slot::SLOT_IS_UNCOVERED ||
-                $slotState === Slot::THERE_IS_A_SHIP ||
-                $slotState === Slot::SHIP_WAS_HIT) {
-                $amount++;
-            } else {
+            if ($squareState === Square::MISSED) {
                 break;
             }
+
+            $amount++;
         }
 
         return $amount;
     }
 
-    /**
-     * Returns number of uncovered slots from below
-     * of our checked slot
-     *
-     * @param array $slots Array with slots
-     * @param int   $x     X-coordinate of checked slot
-     * @param int   $y     Y-coordinate of checked slot
-     *
-     * @return int
-     */
-    private function getAmountOfBottomUncoveredSlots($slots, $x, $y)
+
+    protected function getAmountOfBottomNotMissedSquares(int $x, int $y): int
     {
         $amount = 0;
 
-        for ($j = $y + 1; $j < Field::HEIGT; $j++) {
-            $slotState = $slots[$x][$j]->getState();
+        for ($j = $y + 1; $j < ShootingBoard::HEIGHT; $j++) {
+            $squareState = $this->shootingBoard->getSquare($x, $j)->getState();
 
-            if ($slotState === Slot::SLOT_IS_UNCOVERED ||
-                $slotState === Slot::THERE_IS_A_SHIP ||
-                $slotState === Slot::SHIP_WAS_HIT) {
-                $amount++;
-            } else {
+            if ($squareState === Square::MISSED) {
                 break;
             }
+
+            $amount++;
         }
 
         return $amount;
+    }
+
+
+    protected function getAllPossibleCoordsForRandomShooting(): array
+    {
+        $allCoords = [];
+
+        for ($i = 0; $i < ShootingBoard::WIDTH; $i++) {
+            for ($j = 0; $j < ShootingBoard::HEIGHT; $j++) {
+                $squareState = $this->shootingBoard->getSquare($i, $j)->getState();
+
+                if ($squareState === Square::EMPTY) {
+                    $squareValue = $this->valuesForSquares[$i][$j];
+
+                    $allCoords[] = [$squareValue => [$i, $j]];
+                }
+            }
+        }
+
+        return $allCoords;
+    }
+
+
+    public function reset(): void
+    {
+        $this->valuesForSquares = [];
+        $this->previousShootingCoords = [];
+
+        $this->coordsOfHitShip = [];
+        $this->directionOfHitShip = self::UNKNOWN;
     }
 }
