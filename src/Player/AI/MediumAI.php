@@ -35,15 +35,16 @@ class MediumAI implements InterfaceAI
             $allPossibleCoords = $this->getAllPossibleCoordsOfHitShip();
         }
 
-        shuffle($allPossibleCoords);
         ksort($allPossibleCoords);
 
-        $shootingCoordsWithValue = array_pop($allPossibleCoords);
-        $shootingCoords = array_pop($shootingCoordsWithValue);
+        $bestShootingCoords = array_pop($allPossibleCoords);
+        shuffle($bestShootingCoords);
 
-        $this->previousShootingCoords = $shootingCoords;
+        $coords = array_pop($bestShootingCoords);
 
-        return $shootingCoords;
+        $this->previousShootingCoords = $coords;
+
+        return $coords;
     }
 
 
@@ -158,7 +159,7 @@ class MediumAI implements InterfaceAI
             [$x, $y] = $squareCoords;
             $squareValue = $this->valuesForSquares[$x][$y];
 
-            $result[] = [$squareValue => $squareCoords];
+            $result[$squareValue][] = $squareCoords;
         }
 
         return $result;
@@ -189,13 +190,13 @@ class MediumAI implements InterfaceAI
     {
         $allCoords = [];
 
-        foreach ($this->coordsOfHitShip as [$x, $y]) {
-            $topSquare = $this->shootingBoard->getSquare($x, $y - 1);
+        foreach ($this->coordsOfHitShip as [$hitShipX, $hitShipY]) {
+            $topSquare = $this->shootingBoard->getSquare($hitShipX, $hitShipY - 1);
             if ($topSquare?->getState() === Square::EMPTY) {
                 $allCoords[] = $topSquare->getCoords();
             }
 
-            $bottomSquare = $this->shootingBoard->getSquare($x, $y + 1);
+            $bottomSquare = $this->shootingBoard->getSquare($hitShipX, $hitShipY + 1);
             if ($bottomSquare?->getState() === Square::EMPTY) {
                 $allCoords[] = $bottomSquare->getCoords();
             }
@@ -297,7 +298,7 @@ class MediumAI implements InterfaceAI
                 if ($squareState === Square::EMPTY) {
                     $squareValue = $this->valuesForSquares[$i][$j];
 
-                    $allCoords[] = [$squareValue => [$i, $j]];
+                    $allCoords[$squareValue][] = [$i, $j];
                 }
             }
         }
@@ -313,5 +314,22 @@ class MediumAI implements InterfaceAI
 
         $this->coordsOfHitShip = [];
         $this->directionOfHitShip = self::UNKNOWN;
+    }
+
+
+    protected function shuffle_assoc(&$array): bool
+    {
+        $new = [];
+
+        $keys = array_keys($array);
+        shuffle($keys);
+
+        foreach($keys as $key) {
+            $new[$key] = $array[$key];
+        }
+
+        $array = $new;
+
+        return true;
     }
 }

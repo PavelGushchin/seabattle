@@ -3,7 +3,7 @@
 namespace SeaBattle;
 
 use SeaBattle\Player\AbstractPlayer;
-use SeaBattle\Player\AI\MediumAI;
+use SeaBattle\Player\AI;
 use SeaBattle\Player\EnemyPlayer;
 use SeaBattle\Player\MyPlayer;
 
@@ -28,12 +28,16 @@ class Game
     public function __construct()
     {
         $this->myPlayer = new MyPlayer();
-        $this->enemyPlayer = new EnemyPlayer(new MediumAI());
+        $this->enemyPlayer = new EnemyPlayer(new AI\MediumAI());
     }
 
 
     public function startNewGame(): void
     {
+        $this->myPlayer = new MyPlayer();
+        $this->enemyPlayer = new EnemyPlayer(new AI\MediumAI());
+//        $this->enemyPlayer = new EnemyPlayer(new AI\HardAI());
+
         $this->myPlayer->clearBoards();
         $this->myPlayer->createShips();
 
