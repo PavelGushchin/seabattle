@@ -192,9 +192,9 @@ abstract class AbstractPlayer
 
 
     /**
-     * If I lost I will see where all enemy's alive ships were
+     * If I lost I want to see where all enemy's alive ships were
      */
-    public function showOpponentsShips(array $ships): void
+    public function lookAtOpponentsShips(array $ships): void
     {
         foreach ($ships as $ship) {
             [$headX, $headY] = $ship->getHeadCoords();

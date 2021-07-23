@@ -93,7 +93,7 @@ class Game
                 $this->theWinner = self::ENEMY_IS_THE_WINNER;
                 $this->gameIsRunning = false;
 
-                $myPlayer->showOpponentsShips($this->enemyPlayer->getShipBoard()->getShips());
+                $myPlayer->lookAtOpponentsShips($this->enemyPlayer->getShipBoard()->getShips());
                 return;
             }
         }

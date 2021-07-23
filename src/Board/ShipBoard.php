@@ -30,7 +30,7 @@ class ShipBoard extends AbstractBoard
                 $shipSquare = $this->getSquare($x, $y);
                 $shipSquare->setState(Square::SHIP);
 
-                /** Adding to ship's square the reference to ship */
+                /** Adding to ship's square a reference to the ship */
                 $shipSquare->setShip($ship);
             }
         }
