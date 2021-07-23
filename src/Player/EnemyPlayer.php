@@ -18,7 +18,7 @@ class EnemyPlayer extends AbstractPlayer
 
 
     /**
-     * Shooting is delegated to AI
+     * Shooting by AI
      */
     public function getCoordsForShooting(): array
     {

@@ -15,10 +15,10 @@ class Square
 
     protected int $state = self::EMPTY;
 
-    /** Ship that possibly located in this square */
+    /** Ship that is possibly located in this square */
     protected ?Ship $ship = null;
 
-    /** Coords of that Square on either ShipBoard or ShootingBoard */
+    /** Coords of that Square on Board */
     protected array $coords;
 
 

@@ -92,8 +92,6 @@ abstract class AbstractPlayer
     /**
      * Opponent gave us coordinates for shooting: $x and $y, and we are
      * checking either he missed, or hit, or killed our ship.
-     *
-     * After that we provide him the result of his shooting.
      */
     public function handleShotAndGiveResult(int $x, int $y): array
     {
@@ -127,7 +125,7 @@ abstract class AbstractPlayer
 
 
     /**
-     * Write result of my shooting to ShootingBoard
+     * Writing the result of my shooting to ShootingBoard
      */
     public function writeResultOfShooting(int $x, int $y, array $resultOfShooting): void
     {
@@ -157,7 +155,12 @@ abstract class AbstractPlayer
         }
     }
 
-
+    /**
+     * After ship was killed we have to mark Squares, which represents that ship
+     * on Board, as "KILLED SHIP".
+     * And also we have to mark area around the ship as "MISSED", so player
+     * couldn't shoot to it
+     */
     protected function markShipAsKilledOnBoard(AbstractBoard $board, Ship $ship): void
     {
         [$areaStartX, $areaStartY, $areaEndX, $areaEndY] = $ship->getCoordsOfAreaAroundShip();
@@ -188,6 +191,9 @@ abstract class AbstractPlayer
     }
 
 
+    /**
+     * If I lost I will see where all enemy's alive ships were
+     */
     public function showOpponentsShips(array $ships): void
     {
         foreach ($ships as $ship) {

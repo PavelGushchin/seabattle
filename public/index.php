@@ -17,36 +17,6 @@ if (isset($_GET['start_new_game'])) {
     $game->startNewGame();
 }
 
-if (isset($_GET['autobattle'])) {
-
-    set_time_limit(0);
-
-    $numberOfGames = filter_input(INPUT_GET, 'autobattle', FILTER_SANITIZE_NUMBER_INT);
-    $currentGame = 1;
-
-    $firstAlgorithmWins = 0;
-    $secondAlgorithmWins = 0;
-
-    while($currentGame <= $numberOfGames) {
-        $game = new Game();
-        $game->startAutobattleGame();
-
-        if ($game->getTheWinner() === Game::I_AM_THE_WINNER) {
-            $firstAlgorithmWins++;
-        } elseif ($game->getTheWinner() === Game::ENEMY_IS_THE_WINNER) {
-            $secondAlgorithmWins++;
-        } else {
-            throw new Exception("No winner!");
-        }
-
-        $currentGame++;
-    }
-
-    echo "First algorithm wins - $firstAlgorithmWins<br>";
-    echo "Second algorithm wins - $secondAlgorithmWins<br>";
-}
-
-
 $game->play();
 
 $_SESSION['game'] = serialize($game);

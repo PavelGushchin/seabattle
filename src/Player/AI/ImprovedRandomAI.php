@@ -29,8 +29,8 @@ class ImprovedRandomAI implements InterfaceAI
 
 
     /**
-     * The main goal of this method is to return an
-     * array with coordinates for the next shot
+     * The main goal of this method is to return
+     * an array with coordinates for the next shot
      */
     public function getCoordsForShooting(ShootingBoard $shootingBoard): array
     {
@@ -65,7 +65,7 @@ class ImprovedRandomAI implements InterfaceAI
      *  When we shot previously, we only picked coords [x, y] for that shot,
      *  but we didn't know, what result would be.
      *
-     *  But now when we know the result (either "hit", or "killed" or "missed")
+     *  But now when we know the result (either "hit", or "killed", or "missed")
      *  we have to write that result down
      */
     protected function writeResultOfPreviousShooting(): void
@@ -81,7 +81,7 @@ class ImprovedRandomAI implements InterfaceAI
         switch ($previouslyAttackedSquare->getState()) {
             case Square::HIT_SHIP:
                 /**
-                 * Result of previous shooting is that we hit ship, so we have to
+                 * Result of previous shooting is - we hit ship, so we have to
                  * add these coordinates to array which contains damaged ship parts
                  */
                 $this->partsOfDamagedShip[] = [$previousX, $previousY];

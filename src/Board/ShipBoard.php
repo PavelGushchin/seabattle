@@ -21,16 +21,17 @@ class ShipBoard extends AbstractBoard
     {
         $this->ships[] = $ship;
 
-        /**
-         * Marking squares of ShipBoard as "SHIP"
-         */
         [$headShipX, $headShipY] = $ship->getHeadCoords();
         [$tailShipX, $tailShipY] = $ship->getTailCoords();
 
         for ($x = $headShipX; $x <= $tailShipX; $x++) {
             for ($y = $headShipY; $y <= $tailShipY; $y++) {
-                $this->getSquare($x, $y)->setState(Square::SHIP);
-                $this->getSquare($x, $y)->setShip($ship);
+                /** Marking ship's squares as "SHIP" */
+                $shipSquare = $this->getSquare($x, $y);
+                $shipSquare->setState(Square::SHIP);
+
+                /** Adding to ship's square the reference to ship */
+                $shipSquare->setShip($ship);
             }
         }
     }

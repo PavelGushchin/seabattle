@@ -14,7 +14,7 @@ class ShootingBoard extends AbstractBoard
         $this->killedShips[] = $shipSize;
 
         /**
-         * Remove killed ship from $this->aliveShips array
+         * Removing the killed ship from $this->aliveShips array
          */
         array_splice(
             $this->aliveShips,

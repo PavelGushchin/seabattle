@@ -26,11 +26,6 @@ class SmartAI implements InterfaceAI
     protected string $directionOfHitShip = self::UNKNOWN;
 
     /**
-     * Array with all possible coordinates for next shot
-     */
-    protected array $optionsForNextShot = [];
-
-    /**
      * Saved coordinates of previous shot
      */
     protected array $previousShootingCoords = [];
@@ -61,21 +56,16 @@ class SmartAI implements InterfaceAI
             $optionsForNextShot = $this->getCoordsForKillingHitShip();
         }
 
-        /**
-         * All possible coordinates for next shot we have
-         * in $optionsForNextShot variable
-         */
         ksort($optionsForNextShot);
 
         /**
-         * Extracting options with the biggest values
-         * assigned to coords
+         * Extracting options with the biggest values (the best options)
          */
         $bestOptions = array_pop($optionsForNextShot);
         shuffle($bestOptions);
 
         /**
-         * Finally we got coords for next shot
+         * Finally we get coords for next shot
          */
         $coords = array_pop($bestOptions);
 
@@ -89,7 +79,7 @@ class SmartAI implements InterfaceAI
      *  When we shot previously, we only picked coords [x, y] for that shot,
      *  but we didn't know, what result would be.
      *
-     *  But now when we know the result (either "hit", or "killed" or "missed")
+     *  But now when we know the result (either "hit", or "killed", or "missed")
      *  we have to write that result down
      */
     protected function writeResultOfPreviousShooting(): void
@@ -105,7 +95,7 @@ class SmartAI implements InterfaceAI
         switch ($previouslyAttackedSquare->getState()) {
             case Square::HIT_SHIP:
                 /**
-                 * Result of previous shooting is that we hit ship, so we have to
+                 * Result of previous shooting is - we hit ship, so we have to
                  * add these coordinates to array which contains damaged ship parts
                  */
                 $this->partsOfDamagedShip[] = [$previousX, $previousY];
