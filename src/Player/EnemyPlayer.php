@@ -17,6 +17,9 @@ class EnemyPlayer extends AbstractPlayer
     }
 
 
+    /**
+     * Shooting is delegated to AI
+     */
     public function getCoordsForShooting(): array
     {
         return $this->AI->getCoordsForShooting($this->shootingBoard);

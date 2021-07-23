@@ -16,33 +16,40 @@ class Ship
     protected array $headCoords;
     protected array $tailCoords;
 
-    /** It shows how many times the ship has been hit by our opponent. */
+    /** It shows how many times the ship has been hit by opponent. */
     protected int $numberOfHits = 0;
 
 
+    /**
+     * @throws \Exception if ship's direction is neither HORIZONTAL, nor VERTICAL
+     */
     public function __construct(int $size, int $direction, array $headCoords)
     {
         $this->size = $size;
         $this->direction = $direction;
         $this->headCoords = $headCoords;
 
-        [$x, $y] = $headCoords;
 
+        [$headX, $headY] = $headCoords;
+
+        /** Calculating coords of ship's tail */
         if ($direction === self::HORIZONTAL) {
-            $x += $size - 1;
+            $tailX = $headX + $size - 1;
+            $tailY = $headY;
         } elseif ($direction === self::VERTICAL) {
-            $y += $size - 1;
+            $tailX = $headX;
+            $tailY = $headY + $size - 1;
+        } else {
+            throw new \Exception("Unknown direction!");
         }
 
-        $this->tailCoords = [$x, $y];
+        $this->tailCoords = [$tailX, $tailY];
     }
 
 
     public function addHit(): void
     {
-        if ($this->numberOfHits < $this->size) {
-            $this->numberOfHits++;
-        }
+        $this->numberOfHits++;
     }
 
 
@@ -52,6 +59,14 @@ class Ship
     }
 
 
+    /**
+     * Usages of that function:
+     *
+     * 1) When we create ship we have to be sure that area around
+     * ship is empty
+     * 2) When we kill ship we have to mark all squares around the
+     * ship, so player couldn't shoot to them
+     */
     public function getCoordsOfAreaAroundShip(): array
     {
         [$headShipX, $headShipY] = $this->headCoords;
@@ -88,55 +103,14 @@ class Ship
     }
 
 
-    public function setSize(int $size): void
-    {
-        $this->size = $size;
-    }
-
-
-    public function getDirection(): int
-    {
-        return $this->direction;
-    }
-
-
-    public function setDirection(int $direction): void
-    {
-        $this->direction = $direction;
-    }
-
-
     public function getHeadCoords(): array
     {
         return $this->headCoords;
     }
 
 
-    public function setHeadCoords(array $headCoords): void
-    {
-        $this->headCoords = $headCoords;
-    }
-
     public function getTailCoords(): array
     {
         return $this->tailCoords;
-    }
-
-
-    public function setTailCoords(array $tailCoords): void
-    {
-        $this->tailCoords = $tailCoords;
-    }
-
-
-    public function getNumberOfHits(): int
-    {
-        return $this->numberOfHits;
-    }
-
-
-    public function setNumberOfHits(int $numberOfHits): void
-    {
-        $this->numberOfHits = $numberOfHits;
     }
 }

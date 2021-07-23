@@ -6,60 +6,67 @@ use SeaBattle\Board\ShootingBoard;
 use SeaBattle\Board\Square;
 
 
-class EasyAI implements InterfaceAI
+class ImprovedRandomAI implements InterfaceAI
 {
     public const HORIZONTAL = "Hit ship has horizontal direction";
     public const VERTICAL = "Hit ship has vertical direction";
     public const UNKNOWN = "Hit ship has unknown direction";
 
-    protected array $coordsOfHitShip = [];
+    /** Damaged parts of hit ship will be stored here */
+    protected array $partsOfDamagedShip = [];
     protected string $directionOfHitShip = self::UNKNOWN;
 
-    protected InterfaceAI $randomShooter;
     protected ShootingBoard $shootingBoard;
     protected array $previousShootingCoords = [];
 
+    protected InterfaceAI $randomShooter;
 
 
     public function __construct()
     {
-        $this->randomShooter = new VeryEasyAI();
+        $this->randomShooter = new RandomAI();
     }
 
 
+    /**
+     * The main goal of this method is to return an
+     * array with coordinates for the next shot
+     */
     public function getCoordsForShooting(ShootingBoard $shootingBoard): array
     {
         $this->shootingBoard = $shootingBoard;
 
         $this->writeResultOfPreviousShooting();
 
-        if (empty($this->coordsOfHitShip)) {
-            /** If we don't have a hit ship on Board, then we'll shoot randomly */
-            $randomCoords = $this->getRandomCoords();
+        if (empty($this->partsOfDamagedShip)) {
+            /** We don't have a hit ship on Board, so we'll shoot randomly */
+            $randomCoords = $this->randomShooter->getCoordsForShooting($this->shootingBoard);
+
             $this->previousShootingCoords = $randomCoords;
 
             return $randomCoords;
         }
 
-        /** At this point we know that we have a hit ship on Board,
-         *  so we have to find it and kill
+        /**
+         * We have a hit ship on Board, so we have to find it and kill
          */
         $allPossibleCoordsOfHitShip = $this->getAllPossibleCoordsOfHitShip();
         shuffle($allPossibleCoordsOfHitShip);
 
-        $shootingCoords = array_pop($allPossibleCoordsOfHitShip);
+        $coords = array_pop($allPossibleCoordsOfHitShip);
 
-        $this->previousShootingCoords = $shootingCoords;
+        $this->previousShootingCoords = $coords;
 
-        return $shootingCoords;
+        return $coords;
     }
 
 
     /**
      *  When we shot previously, we only picked coords [x, y] for that shot,
      *  but we didn't know, what result would be.
-     *  Now we know the result: either "hit", or "killed" or "missed".
-     *  So our AI has to synchronize with that result
+     *
+     *  But now when we know the result (either "hit", or "killed" or "missed")
+     *  we have to write that result down
      */
     protected function writeResultOfPreviousShooting(): void
     {
@@ -69,26 +76,34 @@ class EasyAI implements InterfaceAI
 
         [$previousX, $previousY] = $this->previousShootingCoords;
 
-        $currentStateOfSquare = $this->shootingBoard->getSquare($previousX, $previousY)->getState();
+        $previouslyAttackedSquare = $this->shootingBoard->getSquare($previousX, $previousY);
 
-        switch ($currentStateOfSquare) {
+        switch ($previouslyAttackedSquare->getState()) {
             case Square::HIT_SHIP:
-                $this->coordsOfHitShip[] = $this->previousShootingCoords;
-                if (count($this->coordsOfHitShip) === 2) {
-                    $this->directionOfHitShip = $this->defineDirectionOfHitShip();
+                /**
+                 * Result of previous shooting is that we hit ship, so we have to
+                 * add these coordinates to array which contains damaged ship parts
+                 */
+                $this->partsOfDamagedShip[] = [$previousX, $previousY];
+
+                /**
+                 * If we have 2 parts of hit ship then we can determine it's direction
+                 */
+                if (count($this->partsOfDamagedShip) === 2) {
+                    $this->directionOfHitShip = $this->determineDirectionOfHitShip();
                 }
                 break;
             case Square::KILLED_SHIP:
-                $this->coordsOfHitShip = [];
+                $this->partsOfDamagedShip = [];
                 $this->directionOfHitShip = self::UNKNOWN;
                 break;
         }
     }
 
 
-    protected function defineDirectionOfHitShip(): string
+    protected function determineDirectionOfHitShip(): string
     {
-        [$firstPartOfHitShip, $secondPartOfHitShip] = $this->coordsOfHitShip;
+        [$firstPartOfHitShip, $secondPartOfHitShip] = $this->partsOfDamagedShip;
 
         [$x1, $y1] = $firstPartOfHitShip;
         [$x2, $y2] = $secondPartOfHitShip;
@@ -103,6 +118,10 @@ class EasyAI implements InterfaceAI
 
     protected function getAllPossibleCoordsOfHitShip(): array
     {
+        /**
+         * If we know direction of hit ship then we
+         * can shoot only horizontally or vertically
+         */
         switch ($this->directionOfHitShip) {
             case self::HORIZONTAL:
                 return $this->getAllPossibleHorizontalCoordsOfHitShip();
@@ -110,6 +129,10 @@ class EasyAI implements InterfaceAI
                 return $this->getAllPossibleVerticalCoordsOfHitShip();
         }
 
+        /**
+         * If we don't know ship's direction then we will
+         * shoot in both directions
+         */
         return $this->getAllPossibleBidirectionalCoordsOfHitShip();
     }
 
@@ -118,7 +141,7 @@ class EasyAI implements InterfaceAI
     {
         $allCoords = [];
 
-        foreach ($this->coordsOfHitShip as [$hitShipX, $hitShipY]) {
+        foreach ($this->partsOfDamagedShip as [$hitShipX, $hitShipY]) {
             $leftSquare = $this->shootingBoard->getSquare($hitShipX - 1, $hitShipY);
             if ($leftSquare?->getState() === Square::EMPTY) {
                 $allCoords[] = $leftSquare->getCoords();
@@ -138,7 +161,7 @@ class EasyAI implements InterfaceAI
     {
         $allCoords = [];
 
-        foreach ($this->coordsOfHitShip as [$hitShipX, $hitShipY]) {
+        foreach ($this->partsOfDamagedShip as [$hitShipX, $hitShipY]) {
             $topSquare = $this->shootingBoard->getSquare($hitShipX, $hitShipY - 1);
             if ($topSquare?->getState() === Square::EMPTY) {
                 $allCoords[] = $topSquare->getCoords();
@@ -160,19 +183,5 @@ class EasyAI implements InterfaceAI
         $verticalCoords = $this->getAllPossibleVerticalCoordsOfHitShip();
 
         return array_merge($horizontalCoords, $verticalCoords);
-    }
-
-
-    protected function getRandomCoords(): array
-    {
-        return $this->randomShooter->getCoordsForShooting($this->shootingBoard);
-    }
-
-
-    public function reset(): void
-    {
-        $this->directionOfHitShip = self::UNKNOWN;
-        $this->coordsOfHitShip = [];
-        $this->previousShootingCoords = [];
     }
 }

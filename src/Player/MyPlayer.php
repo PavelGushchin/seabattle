@@ -7,6 +7,9 @@ use SeaBattle\Board\Square;
 
 class MyPlayer extends AbstractPlayer
 {
+    /**
+     * Manual shooting
+     */
     public function getCoordsForShooting(): array
     {
         if (isset($_GET["x"], $_GET["y"])) {

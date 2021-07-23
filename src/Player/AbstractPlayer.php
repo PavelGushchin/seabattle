@@ -19,6 +19,10 @@ abstract class AbstractPlayer
     protected ShootingBoard $shootingBoard;
 
 
+    /**
+     * Every child class should implement this method and return
+     * array with coords for shooting: [int $x, int $y]
+     */
     abstract public function getCoordsForShooting(): array;
 
 
@@ -32,7 +36,7 @@ abstract class AbstractPlayer
     public function createShips(): void
     {
         foreach (ShipBoard::SHIPS_TO_CREATE as $ship) {
-            for ($i = 0; $i < $ship["amount"]; $i++) {
+            for ($i = 0; $i < $ship["number"]; $i++) {
                 $this->createShip($ship["ship size"]);
             }
         }
@@ -85,6 +89,12 @@ abstract class AbstractPlayer
     }
 
 
+    /**
+     * Opponent gave us coordinates for shooting: $x and $y, and we are
+     * checking either he missed, or hit, or killed our ship.
+     *
+     * After that we provide him the result of his shooting.
+     */
     public function handleShotAndGiveResult(int $x, int $y): array
     {
         $attackedSquare = $this->shipBoard->getSquare($x, $y);
@@ -116,6 +126,9 @@ abstract class AbstractPlayer
     }
 
 
+    /**
+     * Write result of my shooting to ShootingBoard
+     */
     public function writeResultOfShooting(int $x, int $y, array $resultOfShooting): void
     {
         $attackedSquare = $this->shootingBoard->getSquare($x, $y);
@@ -147,19 +160,18 @@ abstract class AbstractPlayer
 
     protected function markShipAsKilledOnBoard(AbstractBoard $board, Ship $ship): void
     {
-        $areaAroundShip = $ship->getCoordsOfAreaAroundShip();
-        [$areaStartX, $areaStartY, $areaEndX, $areaEndY] = $areaAroundShip;
+        [$areaStartX, $areaStartY, $areaEndX, $areaEndY] = $ship->getCoordsOfAreaAroundShip();
 
         for ($x = $areaStartX; $x <= $areaEndX; $x++) {
             for ($y = $areaStartY; $y <= $areaEndY; $y++) {
-                $currentSquare = $board->getSquare($x, $y);
+                $squareOnBoard = $board->getSquare($x, $y);
 
-                switch ($currentSquare->getState()) {
+                switch ($squareOnBoard->getState()) {
                     case Square::EMPTY:
-                        $currentSquare->setState(Square::MISSED);
+                        $squareOnBoard->setState(Square::MISSED);
                         break;
                     case Square::HIT_SHIP:
-                        $currentSquare->setState(Square::KILLED_SHIP);
+                        $squareOnBoard->setState(Square::KILLED_SHIP);
                         break;
                 }
             }
@@ -167,23 +179,12 @@ abstract class AbstractPlayer
     }
 
 
-    public function clearBoards(): void
-    {
-        $this->shipBoard = new ShipBoard();
-        $this->shootingBoard = new ShootingBoard();
-
-        if (isset($this->AI)) {
-            $this->AI->reset();
-        }
-    }
-
-
     public function hasWon(): bool
     {
-        $killedShips = $this->shootingBoard->getNumberOfKilledShips();
-        $allShips = $this->shipBoard->getNumberOfAllShips();
+        $killedEnemyShips = $this->shootingBoard->getNumberOfKilledShips();
+        $allEnemyShips = $this->shipBoard->getNumberOfShips();
 
-        return $killedShips === $allShips;
+        return $allEnemyShips === $killedEnemyShips;
     }
 
 

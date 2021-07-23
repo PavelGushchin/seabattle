@@ -15,17 +15,16 @@ class Square
 
     protected int $state = self::EMPTY;
 
-    /** Ship that is possibly located in this square */
+    /** Ship that possibly located in this square */
     protected ?Ship $ship = null;
 
-    /** Coords on Board */
-    protected int $x, $y;
+    /** Coords of that Square on either ShipBoard or ShootingBoard */
+    protected array $coords;
 
 
     public function __construct(int $x, int $y)
     {
-        $this->x = $x;
-        $this->y = $y;
+        $this->coords = [$x, $y];
     }
 
 
@@ -53,20 +52,8 @@ class Square
     }
 
 
-    public function getX(): int
-    {
-        return $this->x;
-    }
-
-
-    public function getY(): int
-    {
-        return $this->y;
-    }
-
-
     public function getCoords(): array
     {
-        return [$this->x, $this->y];
+        return $this->coords;
     }
 }

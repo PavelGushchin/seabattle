@@ -8,6 +8,9 @@ abstract class AbstractBoard
     public const WIDTH = 10;
     public const HEIGHT = 10;
 
+    /**
+     * Board consists of (WIDTH * HEIGHT) squares
+     */
     protected array $squares;
 
 

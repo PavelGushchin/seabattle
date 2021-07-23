@@ -34,12 +34,9 @@ class Game
     public function startNewGame(): void
     {
         $this->myPlayer = new MyPlayer();
-        $this->enemyPlayer = new EnemyPlayer(new AI\HardAI());
-
-        $this->myPlayer->clearBoards();
         $this->myPlayer->createShips();
 
-        $this->enemyPlayer->clearBoards();
+        $this->enemyPlayer = new EnemyPlayer(new AI\SmartAI());
         $this->enemyPlayer->createShips();
 
         $this->theWinner = self::NO_WINNER;
@@ -57,7 +54,7 @@ class Game
         $myPlayer = $this->myPlayer;
         $enemyPlayer = $this->enemyPlayer;
 
-        /** My shooting **/
+        /** My player is shooting **/
         [$x, $y] = $myPlayer->getCoordsForShooting();
 
         if ($x === null || $y === null) {
@@ -79,7 +76,7 @@ class Game
             return;
         }
 
-        /** Enemy's shooting **/
+        /** Enemy player is shooting **/
         while ($this->whoIsNext === self::ENEMY_IS_NEXT) {
             [$x, $y] = $enemyPlayer->getCoordsForShooting();
 
@@ -121,10 +118,10 @@ class Game
 
     public function startAutobattleGame()
     {
-        $this->myPlayer = new EnemyPlayer(new AI\HardAI());
+        $this->myPlayer = new EnemyPlayer(new AI\SmartAI());
         $this->myPlayer->createShips();
 
-        $this->enemyPlayer = new EnemyPlayer(new AI\MediumAI());
+        $this->enemyPlayer = new EnemyPlayer(new AI\ImprovedRandomAI());
         $this->enemyPlayer->createShips();
 
         $this->theWinner = self::NO_WINNER;

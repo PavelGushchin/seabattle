@@ -8,15 +8,8 @@ use SeaBattle\Board\ShootingBoard;
 interface InterfaceAI
 {
     /**
-     * The main goal of this method is to return an array
-     * which contains coordinates for next shooting
+     * The main goal of this method is to return an
+     * array with coordinates for the next shot
      */
     public function getCoordsForShooting(ShootingBoard $shootingBoard): array;
-
-
-    /**
-     * This method is called when user clicks "Start new game"
-     * button, so you have to reset all current AI data
-     */
-    public function reset(): void;
 }

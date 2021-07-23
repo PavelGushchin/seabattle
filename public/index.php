@@ -3,8 +3,6 @@
 require "../vendor/autoload.php";
 
 use SeaBattle\Game;
-use SeaBattle\Player\EnemyPlayer;
-use SeaBattle\Player\MyPlayer;
 
 
 session_start();
@@ -28,9 +26,6 @@ if (isset($_GET['autobattle'])) {
 
     $firstAlgorithmWins = 0;
     $secondAlgorithmWins = 0;
-
-    $firstAlgorithmTotalShots = 0;
-    $secondAlgorithmTotalShots = 0;
 
     while($currentGame <= $numberOfGames) {
         $game = new Game();
