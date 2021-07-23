@@ -5,19 +5,16 @@ namespace SeaBattle\Board;
 
 class ShootingBoard extends AbstractBoard
 {
-    protected array $allShips = [];
+    protected array $aliveShips = [];
     protected array $killedShips = [];
-
-
-    public function getKilledShips(): array
-    {
-        return $this->killedShips;
-    }
 
 
     public function addKilledShip(int $shipSize): void
     {
         $this->killedShips[] = $shipSize;
+
+        $indexOfShip = array_search($shipSize, $this->aliveShips, true);
+        array_splice($this->aliveShips, $indexOfShip, 1);
     }
 
 
@@ -27,20 +24,14 @@ class ShootingBoard extends AbstractBoard
     }
 
 
-    public function getAllShips(): array
-    {
-        return $this->allShips;
-    }
-
-
-    public function addShip(int $shipSize): void
-    {
-        $this->allShips[] = $shipSize;
-    }
-
-
     public function getAliveShips(): array
     {
-        return array_diff($this->allShips, $this->killedShips);
+        return $this->aliveShips;
+    }
+
+
+    public function addAliveShip(int $shipSize): void
+    {
+        $this->aliveShips[] = $shipSize;
     }
 }

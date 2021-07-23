@@ -57,7 +57,7 @@ abstract class AbstractPlayer
         } while (! $canShipBeCreated);
 
         $this->shipBoard->addShip($ship);
-        $this->shootingBoard->addShip($shipSize);
+        $this->shootingBoard->addAliveShip($shipSize);
     }
 
 

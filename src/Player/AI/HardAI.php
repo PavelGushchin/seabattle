@@ -33,7 +33,6 @@ class HardAI extends MediumAI
 
     protected function getMaxSizeOfAliveShips(): int
     {
-        // TODO: check it
         $aliveShips = $this->shootingBoard->getAliveShips();
         rsort($aliveShips);
 
