@@ -36,6 +36,12 @@ class ShipBoard extends AbstractBoard
     }
 
 
+    public function getShips(): array
+    {
+        return $this->ships;
+    }
+
+
     public function getNumberOfShips(): int
     {
         return count($this->ships);

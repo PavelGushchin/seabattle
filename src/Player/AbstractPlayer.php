@@ -188,14 +188,32 @@ abstract class AbstractPlayer
     }
 
 
-    public function printShipBoard(): string
+    public function showOpponentsShips(array $ships): void
     {
-        return $this->shipBoard->print();
+        foreach ($ships as $ship) {
+            [$headX, $headY] = $ship->getHeadCoords();
+            [$tailX, $tailY] = $ship->getTailCoords();
+
+            for ($x = $headX; $x <= $tailX; $x++) {
+                for ($y = $headY; $y <= $tailY; $y++) {
+                    $currentSquare = $this->shootingBoard->getSquare($x, $y);
+                    if ($currentSquare->getState() === Square::EMPTY) {
+                        $currentSquare->setState(Square::SHIP);
+                    }
+                }
+            }
+        }
     }
 
 
-    public function printShootingBoard(): string
+    public function getShipBoard(): ShipBoard
     {
-        return $this->shootingBoard->print();
+        return $this->shipBoard;
+    }
+
+
+    public function getShootingBoard(): ShootingBoard
+    {
+        return $this->shootingBoard;
     }
 }

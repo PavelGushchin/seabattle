@@ -70,7 +70,7 @@ $_SESSION['game'] = serialize($game);
     
                 <div id="shipBoard">
                     <?php
-                        echo $game->getMyPlayer()->printShipBoard();
+                        echo $game->getMyPlayer()->getShipBoard()->print();
                     ?>
                 </div>
             </div>
@@ -80,7 +80,7 @@ $_SESSION['game'] = serialize($game);
     
                 <div id="shootingBoard">
                     <?php
-                        echo $game->getMyPlayer()->printShootingBoard();
+                        echo $game->getMyPlayer()->getShootingBoard()->print();
                     ?>
                 </div>
             </div>
