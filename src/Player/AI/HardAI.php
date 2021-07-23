@@ -70,11 +70,8 @@ class HardAI extends MediumAI
     {
         $areas = [];
 
-        $offsetX = ShootingBoard::WIDTH % $size;
-        $offsetY = ShootingBoard::HEIGHT % $size;
-
-        for ($x = 0; $x <= $offsetX; $x++) {
-            for ($y = 0; $y <= $offsetY; $y++) {
+        for ($x = 0; $x < $size; $x++) {
+            for ($y = 0; $y < $size; $y++) {
                 $areas[] = $this->split($x, $y, $size);
             }
         }
