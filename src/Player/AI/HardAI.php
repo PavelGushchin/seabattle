@@ -45,56 +45,41 @@ class HardAI extends MediumAI
         $areas = $this->splitBoardToSquareAreas($maxShipSize);
         shuffle($areas);
 
-        $allCoords = [];
         foreach ($areas as $area) {
             $lines = $this->splitAreaToLines($area);
 
-            foreach ($lines as $line) {
-                foreach ($line as $coords) {
-                    [$x, $y] = $coords;
-                    $allCoords["$x$y"] = $coords;
-                }
+            if (empty($lines)) {
+                continue;
             }
+
+            shuffle($lines);
+
+            $line = array_pop($lines);
+            shuffle($line);
+
+            $coords = array_pop($line);
+
+            return [$maxShipSize => [$coords]];
         }
 
-        $result = [];
-        foreach ($allCoords as $coords) {
-            [$x, $y] = $coords;
-            $value = $this->valuesForSquares[$x][$y];
-            $result[$value][] = [$x, $y];
-        }
-
-        return $result;
+        throw new \Exception("We should never reach this line!");
     }
 
 
     protected function splitBoardToSquareAreas(int $size): array
     {
+        $areas = [];
+
         $offsetX = ShootingBoard::WIDTH % $size;
         $offsetY = ShootingBoard::HEIGHT % $size;
 
-        if ($offsetX === 0 && $offsetY === 0) {
-            $areas = $this->split(0, 0, $size);
-        } elseif ($offsetX === 0 && $offsetY !== 0) {
-            $areas = array_merge(
-                $this->split(0, 0, $size),
-                $this->split(0, $offsetY, $size),
-            );
-        } elseif ($offsetX !== 0 && $offsetY === 0) {
-            $areas = array_merge(
-                $this->split(0, 0, $size),
-                $this->split($offsetX, 0, $size),
-            );
-        } else {
-            $areas = array_merge(
-                $this->split(0, 0, $size),
-                $this->split($offsetX, 0, $size),
-                $this->split(0, $offsetY, $size),
-                $this->split($offsetX, $offsetY, $size),
-            );
+        for ($x = 0; $x <= $offsetX; $x++) {
+            for ($y = 0; $y <= $offsetY; $y++) {
+                $areas[] = $this->split($x, $y, $size);
+            }
         }
 
-        return $areas;
+        return array_merge(...$areas);
     }
 
 
