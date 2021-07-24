@@ -7,9 +7,9 @@ use SeaBattle\Board\Square;
 
 
 /**
- * The main idea of this algorithm is that to each Square on Board
- * will be assigned its own value and we'll have to shoot to Squares
- * with the highest values first
+ * The main idea of this algorithm is that for each Square on Board
+ * we will assign values, and we'll be shooting to Squares with
+ * the highest values first
  */
 class SmartAI implements InterfaceAI
 {
