@@ -71,7 +71,6 @@ $_SESSION['game'] = serialize($game);
             </form>
         </div>
 
-        <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
-        <script src="js/scripts.js"></script>
+        <script src="js/main.js"></script>
     </body>
 </html>

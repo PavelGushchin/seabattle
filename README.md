@@ -1,13 +1,9 @@
 # Sea Battle
 
-## About
+## Description
 The main goal of the game is to kill all enemy's ships before the enemy kills yours.
 
 ![Screenshot from the game](public/img/screenshot.png)
-
-
-## Description
-Originally I wrote this project on PHP 5.6 in 2016, but now I rewrote it on PHP 8.
 
 I didn't use any frameworks, libraries or anything else, just pure PHP.
 
@@ -15,7 +11,7 @@ I didn't use any frameworks, libraries or anything else, just pure PHP.
 I wrote 3 algorithms:
 1) RandomAI - just shooting randomly without trying to kill damaged ships.
 2) ImprovedRandomAI - shooting randomly, but when ship is damaged, AI is trying to kill it.
-3) SmartAI - a little bit more complicated than ImprovedRandomAI, but it's working better.
+3) SmartAI - it's working better than ImprovedRandomAI, but it has a little bit more complicated implementation.
 
 ## How to
 
